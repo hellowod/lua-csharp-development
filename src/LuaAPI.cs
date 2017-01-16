@@ -313,14 +313,11 @@ namespace CsharpLua
             return API.PCallK(numArgs, numResults, errFunc, 0, null);
         }
 
-        ThreadStatus ILuaAPI.PCallK(int numArgs, int numResults, int errFunc,
-            int context, CSharpFunctionDelegate continueFunc)
+        ThreadStatus ILuaAPI.PCallK(int numArgs, int numResults, int errFunc, int context, CSharpFunctionDelegate continueFunc)
         {
-            LuaUtil.ApiCheck(continueFunc == null || !CI.IsLua,
-                "cannot use continuations inside hooks");
+            LuaUtil.ApiCheck(continueFunc == null || !CI.IsLua,"cannot use continuations inside hooks");
             LuaUtil.ApiCheckNumElems(this, numArgs + 1);
-            LuaUtil.ApiCheck(Status == ThreadStatus.LUA_OK,
-                "cannot do calls on non-normal thread");
+            LuaUtil.ApiCheck(Status == ThreadStatus.LUA_OK,"cannot do calls on non-normal thread");
             CheckResults(numArgs, numResults);
 
             int func;
