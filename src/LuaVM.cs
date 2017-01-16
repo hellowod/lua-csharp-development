@@ -257,7 +257,9 @@ namespace CsharpLua
                             var rkb = env.RKB;
                             var rkc = env.RKC;
                             if (rkb.V.TtIsNumber() && rkc.V.TtIsNumber()) {
-                                ra.V.SetNValue(rkb.V.NValue + rkc.V.NValue); } else { V_Arith(ra, rkb, rkc, TMS.TM_ADD);
+                                ra.V.SetNValue(rkb.V.NValue + rkc.V.NValue);
+                            } else {
+                                V_Arith(ra, rkb, rkc, TMS.TM_ADD);
                             }
 
                             env.Base = ci.BaseIndex;
@@ -268,7 +270,9 @@ namespace CsharpLua
                             var rkb = env.RKB;
                             var rkc = env.RKC;
                             if (rkb.V.TtIsNumber() && rkc.V.TtIsNumber()) {
-                                ra.V.SetNValue(rkb.V.NValue - rkc.V.NValue); } else { V_Arith(ra, rkb, rkc, TMS.TM_SUB);
+                                ra.V.SetNValue(rkb.V.NValue - rkc.V.NValue);
+                            } else {
+                                V_Arith(ra, rkb, rkc, TMS.TM_SUB);
                             }
                             env.Base = ci.BaseIndex;
                             break;
@@ -278,7 +282,9 @@ namespace CsharpLua
                             var rkb = env.RKB;
                             var rkc = env.RKC;
                             if (rkb.V.TtIsNumber() && rkc.V.TtIsNumber()) {
-                                ra.V.SetNValue(rkb.V.NValue * rkc.V.NValue); } else { V_Arith(ra, rkb, rkc, TMS.TM_MUL);
+                                ra.V.SetNValue(rkb.V.NValue * rkc.V.NValue);
+                            } else {
+                                V_Arith(ra, rkb, rkc, TMS.TM_MUL);
                             }
                             env.Base = ci.BaseIndex;
                             break;
@@ -288,7 +294,9 @@ namespace CsharpLua
                             var rkb = env.RKB;
                             var rkc = env.RKC;
                             if (rkb.V.TtIsNumber() && rkc.V.TtIsNumber()) {
-                                ra.V.SetNValue(rkb.V.NValue / rkc.V.NValue); } else { V_Arith(ra, rkb, rkc, TMS.TM_DIV);
+                                ra.V.SetNValue(rkb.V.NValue / rkc.V.NValue);
+                            } else {
+                                V_Arith(ra, rkb, rkc, TMS.TM_DIV);
                             }
                             env.Base = ci.BaseIndex;
                             break;
@@ -391,21 +399,22 @@ namespace CsharpLua
                         }
 
                     case OpCode.OP_LE: {
-                            var expectCmpResult = i.GETARG_A() != 0;
-                            if (V_LessEqual(env.RKB, env.RKC) != expectCmpResult)
+                            bool expectCmpResult = i.GETARG_A() != 0;
+                            if (V_LessEqual(env.RKB, env.RKC) != expectCmpResult) {
                                 ci.SavedPc.Index += 1;
-                            else
+                            } else {
                                 V_DoNextJump(ci);
+                            }
                             env.Base = ci.BaseIndex;
                             break;
                         }
 
                     case OpCode.OP_TEST: {
-                            if ((i.GETARG_C() != 0) ?
-                                IsFalse(ref ra.V) : !IsFalse(ref ra.V)) {
+                            if ((i.GETARG_C() != 0) ? IsFalse(ref ra.V) : !IsFalse(ref ra.V)) {
                                 ci.SavedPc.Index += 1;
-                            } else V_DoNextJump(ci);
-
+                            } else {
+                                V_DoNextJump(ci);
+                            }
                             env.Base = ci.BaseIndex;
                             break;
                         }
@@ -441,7 +450,9 @@ namespace CsharpLua
 
                     case OpCode.OP_TAILCALL: {
                             int b = i.GETARG_B();
-                            if (b != 0) { Top = Stack[ra.Index + b]; }  // else previous instruction set top
+                            if (b != 0) {
+                                Top = Stack[ra.Index + b];
+                            }  // else previous instruction set top
 
                             LuaUtil.Assert(i.GETARG_C() - 1 == LuaDef.LUA_MULTRET);
 
@@ -464,7 +475,9 @@ namespace CsharpLua
                                 // last stack slot filled by 'precall'
                                 int lim = nci.BaseIndex + ncl.Proto.NumParams;
 
-                                if (cl.Proto.P.Count > 0) { F_Close(Stack[env.Base]); }
+                                if (cl.Proto.P.Count > 0) {
+                                    F_Close(Stack[env.Base]);
+                                }
 
                                 // move new frame into old one
                                 var nindex = nfunc.Index;
@@ -492,7 +505,9 @@ namespace CsharpLua
                     case OpCode.OP_RETURN: {
                             int b = i.GETARG_B();
                             if (b != 0) { Top = Stack[ra.Index + b - 1]; }
-                            if (cl.Proto.P.Count > 0) { F_Close(Stack[env.Base]); }
+                            if (cl.Proto.P.Count > 0) {
+                                F_Close(Stack[env.Base]);
+                            }
                             b = D_PosCall(ra.Index);
                             if ((ci.CallStatus & CallStatus.CIST_REENTRY) == 0) {
                                 return;
