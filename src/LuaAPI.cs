@@ -321,13 +321,13 @@ namespace CsharpLua
             CheckResults(numArgs, numResults);
 
             int func;
-            if (errFunc == 0)
+            if (errFunc == 0) {
                 func = 0;
-            else {
+            } else {
                 StkId addr;
-                if (!Index2Addr(errFunc, out addr))
+                if (!Index2Addr(errFunc, out addr)) {
                     LuaUtil.InvalidIndex();
-
+                }
                 func = addr.Index;
             }
 
@@ -335,8 +335,8 @@ namespace CsharpLua
             CallS c = new CallS();
             c.L = this;
             c.FuncIndex = Top.Index - (numArgs + 1);
-            if (continueFunc == null || NumNonYieldable > 0) // no continuation or no yieldable?
-            {
+            // no continuation or no yieldable?
+            if (continueFunc == null || NumNonYieldable > 0) {
                 c.NumResults = numResults;
                 status = D_PCall(DG_F_Call, ref c, c.FuncIndex, func);
             } else {
@@ -357,6 +357,7 @@ namespace CsharpLua
                 status = ThreadStatus.LUA_OK;
             }
             AdjustResults(numResults);
+
             return status;
         }
 

@@ -66,8 +66,8 @@ namespace CsharpLua
 
             ErrFunc = errFunc;
             ThreadStatus status = D_RawRunProtected<T>(func, ref ud);
-            if (status != ThreadStatus.LUA_OK) // an error occurred?
-            {
+            // an error occurred?
+            if (status != ThreadStatus.LUA_OK) {
                 F_Close(Stack[oldTopIndex]);
                 SetErrorObj(status, Stack[oldTopIndex]);
                 CI = BaseCI[oldCIIndex];
@@ -81,19 +81,23 @@ namespace CsharpLua
         private void D_Call(StkId func, int nResults, bool allowYield)
         {
             if (++NumCSharpCalls >= LuaLimits.LUAI_MAXCCALLS) {
-                if (NumCSharpCalls == LuaLimits.LUAI_MAXCCALLS)
+                if (NumCSharpCalls == LuaLimits.LUAI_MAXCCALLS) {
                     G_RunError("CSharp Stack Overflow");
-                else if (NumCSharpCalls >=
-                        (LuaLimits.LUAI_MAXCCALLS + (LuaLimits.LUAI_MAXCCALLS >> 3))
-                    )
+                } else if (NumCSharpCalls >= (LuaLimits.LUAI_MAXCCALLS + (LuaLimits.LUAI_MAXCCALLS >> 3))) {
                     D_Throw(ThreadStatus.LUA_ERRERR);
+                }
             }
-            if (!allowYield)
+            if (!allowYield) {
                 NumNonYieldable++;
-            if (!D_PreCall(func, nResults)) // is a Lua function ?
+            }
+            // is a Lua function ?
+            if (!D_PreCall(func, nResults)) {
                 V_Execute();
-            if (!allowYield)
+            }
+            if (!allowYield) {
                 NumNonYieldable--;
+            }
+                
             NumCSharpCalls--;
         }
 
