@@ -1,7 +1,7 @@
 ﻿
 // TODO
 
-namespace UniLua
+namespace CsharpLua
 {
 
 	internal class  LuaIOLib

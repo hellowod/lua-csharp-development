@@ -4,12 +4,12 @@
 
 using System;
 
-namespace UniLua
+namespace CsharpLua
 {
 	using DebugS = System.Diagnostics.Debug;
 	using NumberStyles = System.Globalization.NumberStyles;
 
-	internal static class Utl
+	internal static class LuaUtil
 	{
 		private static void Throw( params string[] msgs )
 		{

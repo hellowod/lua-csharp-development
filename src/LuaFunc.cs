@@ -3,9 +3,9 @@
 
 using System.Collections.Generic;
 
-using ULDebug = UniLua.Tools.ULDebug;
+using ULDebug = CsharpLua.Tools.CLDebug;
 
-namespace UniLua
+namespace CsharpLua
 {
 	public partial class LuaState
 	{

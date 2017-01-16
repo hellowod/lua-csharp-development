@@ -2,7 +2,7 @@
 
 // #define DEBUG_RECORD_INS
 
-namespace UniLua
+namespace CsharpLua
 {
 	public interface ILoadInfo
 	{
@@ -228,7 +228,7 @@ namespace UniLua
 			}
 
 			var cl = new LuaLClosureValue( proto );
-			Utl.Assert(cl.Upvals.Length == cl.Proto.Upvalues.Count);
+			LuaUtil.Assert(cl.Upvals.Length == cl.Proto.Upvalues.Count);
 
 			L.Top.V.SetClLValue(cl);
 			L.IncrTop();
@@ -242,7 +242,7 @@ namespace UniLua
 
 			if( status == ThreadStatus.LUA_OK ) {
 				var below = Stack[Top.Index-1];
-				Utl.Assert(below.V.TtIsFunction() && below.V.ClIsLuaClosure());
+				LuaUtil.Assert(below.V.TtIsFunction() && below.V.ClIsLuaClosure());
 				var cl = below.V.ClLValue();
 				if(cl.Upvals.Length == 1) {
 					var gt = G.Registry.V.HValue().GetInt(LuaDef.LUA_RIDX_GLOBALS);
@@ -255,7 +255,7 @@ namespace UniLua
 
 		DumpStatus ILuaAPI.Dump( LuaWriter writeFunc )
 		{
-			Utl.ApiCheckNumElems( this, 1 );
+			LuaUtil.ApiCheckNumElems( this, 1 );
 
 			var below = Stack[Top.Index-1];
 			if(!below.V.TtIsFunction() || !below.V.ClIsLuaClosure())
@@ -296,10 +296,10 @@ namespace UniLua
 		void ILuaAPI.CallK( int numArgs, int numResults,
 			int context, CSharpFunctionDelegate continueFunc )
 		{
-			Utl.ApiCheck( continueFunc == null || !CI.IsLua,
+			LuaUtil.ApiCheck( continueFunc == null || !CI.IsLua,
 				"cannot use continuations inside hooks" );
-			Utl.ApiCheckNumElems( this, numArgs + 1 );
-			Utl.ApiCheck( Status == ThreadStatus.LUA_OK,
+			LuaUtil.ApiCheckNumElems( this, numArgs + 1 );
+			LuaUtil.ApiCheck( Status == ThreadStatus.LUA_OK,
 				"cannot do calls on non-normal thread" );
 			CheckResults( numArgs, numResults );
 			var func = Stack[Top.Index - (numArgs+1)];
@@ -335,7 +335,7 @@ namespace UniLua
 
 		private void CheckResults( int numArgs, int numResults )
 		{
-			Utl.ApiCheck( numResults == LuaDef.LUA_MULTRET ||
+			LuaUtil.ApiCheck( numResults == LuaDef.LUA_MULTRET ||
 				CI.TopIndex - Top.Index >= numResults - numArgs,
 				"results from function overflow current stack size" );
 		}
@@ -357,10 +357,10 @@ namespace UniLua
 		ThreadStatus ILuaAPI.PCallK( int numArgs, int numResults, int errFunc,
 			int context, CSharpFunctionDelegate continueFunc )
 		{
-			Utl.ApiCheck( continueFunc == null || !CI.IsLua,
+			LuaUtil.ApiCheck( continueFunc == null || !CI.IsLua,
 				"cannot use continuations inside hooks" );
-			Utl.ApiCheckNumElems( this, numArgs + 1 );
-			Utl.ApiCheck( Status == ThreadStatus.LUA_OK,
+			LuaUtil.ApiCheckNumElems( this, numArgs + 1 );
+			LuaUtil.ApiCheck( Status == ThreadStatus.LUA_OK,
 				"cannot do calls on non-normal thread" );
 			CheckResults( numArgs, numResults );
 
@@ -371,7 +371,7 @@ namespace UniLua
 			{
 				StkId addr;
 				if( !Index2Addr( errFunc, out addr ) )
-					Utl.InvalidIndex();
+					LuaUtil.InvalidIndex();
 
 				func = addr.Index;
 			}
@@ -410,8 +410,8 @@ namespace UniLua
 		private void FinishCSharpCall()
 		{
 			CallInfo ci = CI;
-			Utl.Assert( ci.ContinueFunc != null ); // must have a continuation
-			Utl.Assert( NumNonYieldable == 0 );
+			LuaUtil.Assert( ci.ContinueFunc != null ); // must have a continuation
+			LuaUtil.Assert( NumNonYieldable == 0 );
 			// finish `CallK'
 			AdjustResults( ci.NumResults );
 			// call continuation function
@@ -419,13 +419,13 @@ namespace UniLua
 			{
 				ci.Status = ThreadStatus.LUA_YIELD; // `default' status
 			}
-			Utl.Assert( ci.Status != ThreadStatus.LUA_OK );
+			LuaUtil.Assert( ci.Status != ThreadStatus.LUA_OK );
 			ci.CallStatus = ( ci.CallStatus
 							& ~( CallStatus.CIST_YPCALL | CallStatus.CIST_STAT))
 							| CallStatus.CIST_YIELDED;
 
 			int n = ci.ContinueFunc( this ); // call
-			Utl.ApiCheckNumElems( this, n );
+			LuaUtil.ApiCheckNumElems( this, n );
 			// finish `D_PreCall'
 			D_PosCall( Top.Index-n );
 		}
@@ -529,14 +529,14 @@ namespace UniLua
 						ci.Status = ThreadStatus.LUA_YIELD; // `default' status
 						ci.CallStatus |= CallStatus.CIST_YIELDED;
 						int n = ci.ContinueFunc( this ); // call continuation
-						Utl.ApiCheckNumElems( this, n );
+						LuaUtil.ApiCheckNumElems( this, n );
 						firstArg = Top.Index - n; // yield results come from continuation
 					}
 					D_PosCall(firstArg);
 				}
 				Unroll();
 			}
-			Utl.Assert( numCSharpCalls == NumCSharpCalls );
+			LuaUtil.Assert( numCSharpCalls == NumCSharpCalls );
 		}
 		struct ResumeParam
 		{
@@ -555,7 +555,7 @@ namespace UniLua
 			NumCSharpCalls = (fromState != null) ? fromState.NumCSharpCalls + 1 : 1;
 			NumNonYieldable = 0; // allow yields
 
-			Utl.ApiCheckNumElems( this, (Status == ThreadStatus.LUA_OK) ? numArgs + 1 : numArgs );
+			LuaUtil.ApiCheckNumElems( this, (Status == ThreadStatus.LUA_OK) ? numArgs + 1 : numArgs );
 
 			var resumeParam = new ResumeParam();
 			resumeParam.L = this;
@@ -583,12 +583,12 @@ namespace UniLua
 						break;
 					}
 				}
-				Utl.Assert( status == Status );
+				LuaUtil.Assert( status == Status );
 			}
 
 			NumNonYieldable = 1; // do not allow yields
 			NumCSharpCalls--;
-			Utl.Assert( NumCSharpCalls == ((fromState != null) ? fromState.NumCSharpCalls : 0) );
+			LuaUtil.Assert( NumCSharpCalls == ((fromState != null) ? fromState.NumCSharpCalls : 0) );
 			return status;
 		}
 
@@ -601,7 +601,7 @@ namespace UniLua
 			int context, CSharpFunctionDelegate continueFunc )
 		{
 			CallInfo ci = CI;
-			Utl.ApiCheckNumElems( this, numResults );
+			LuaUtil.ApiCheckNumElems( this, numResults );
 
 			if( NumNonYieldable > 0 )
 			{
@@ -614,7 +614,7 @@ namespace UniLua
 			ci.ExtraIndex = ci.FuncIndex; // save current `func'
 			if( ci.IsLua ) // inside a hook
 			{
-				Utl.ApiCheck( continueFunc == null, "hooks cannot continue after yielding" );
+				LuaUtil.ApiCheck( continueFunc == null, "hooks cannot continue after yielding" );
 			}
 			else
 			{
@@ -626,7 +626,7 @@ namespace UniLua
 				ci.FuncIndex = Top.Index - (numResults + 1);
 				D_Throw( ThreadStatus.LUA_YIELD );
 			}
-			Utl.Assert( (ci.CallStatus & CallStatus.CIST_HOOKED) != 0 ); // must be inside a hook
+			LuaUtil.Assert( (ci.CallStatus & CallStatus.CIST_HOOKED) != 0 ); // must be inside a hook
 			return 0;
 		}
 		
@@ -647,7 +647,7 @@ namespace UniLua
 		{
 			if( index >= 0 )
 			{
-				Utl.ApiCheck(index <= StackLast-(CI.FuncIndex+1), "new top too large");
+				LuaUtil.ApiCheck(index <= StackLast-(CI.FuncIndex+1), "new top too large");
 				int newTop = CI.FuncIndex+1+index;
 				for(int i=Top.Index; i<newTop; ++i)
 					{ Stack[i].V.SetNilValue(); }
@@ -655,7 +655,7 @@ namespace UniLua
 			}
 			else
 			{
-				Utl.ApiCheck( -(index+1) <= (Top.Index - (CI.FuncIndex + 1)), "invalid new top" );
+				LuaUtil.ApiCheck( -(index+1) <= (Top.Index - (CI.FuncIndex + 1)), "invalid new top" );
 				Top = Stack[Top.Index + index + 1];
 			}
 		}
@@ -664,7 +664,7 @@ namespace UniLua
 		{
 			StkId addr;
 			if( !Index2Addr( index, out addr ) )
-				Utl.InvalidIndex();
+				LuaUtil.InvalidIndex();
 
 			for(int i=addr.Index+1; i<Top.Index; ++i)
 				{ Stack[i-1].V.SetObj(ref Stack[i].V); }
@@ -676,7 +676,7 @@ namespace UniLua
 		{
 			StkId p;
 			if( !Index2Addr( index, out p ) )
-				Utl.InvalidIndex();
+				LuaUtil.InvalidIndex();
 
 			int i = Top.Index;
 			while(i > p.Index) {
@@ -690,14 +690,14 @@ namespace UniLua
 		{
 			StkId to;
 			if( !Index2Addr( index, out to ) )
-				Utl.InvalidIndex();
+				LuaUtil.InvalidIndex();
 
 			to.V.SetObj(ref fr.V);
 		}
 
 		void ILuaAPI.Replace( int index )
 		{
-			Utl.ApiCheckNumElems( this, 1 );
+			LuaUtil.ApiCheckNumElems( this, 1 );
 			MoveTo( Stack[Top.Index-1], index );
 			Top = Stack[Top.Index-1];
 		}
@@ -706,7 +706,7 @@ namespace UniLua
 		{
 			StkId fr;
 			if( !Index2Addr( fromIndex, out fr ) )
-				Utl.InvalidIndex();
+				LuaUtil.InvalidIndex();
 			MoveTo( fr, toIndex );
 		}
 
@@ -716,9 +716,9 @@ namespace UniLua
 			if( (LuaState)this == toLua )
 				return;
 
-			Utl.ApiCheckNumElems( this, n );
-			Utl.ApiCheck( G == toLua.G, "moving among independent states" );
-			Utl.ApiCheck( toLua.CI.TopIndex - toLua.Top.Index >= n, "not enough elements to move" );
+			LuaUtil.ApiCheckNumElems( this, n );
+			LuaUtil.ApiCheck( G == toLua.G, "moving among independent states" );
+			LuaUtil.ApiCheck( toLua.CI.TopIndex - toLua.Top.Index >= n, "not enough elements to move" );
 
 			int index = Top.Index-n;
 			Top = Stack[index];
@@ -768,7 +768,7 @@ namespace UniLua
 
 		int ILuaAPI.Error()
 		{
-			Utl.ApiCheckNumElems( this, 1 );
+			LuaUtil.ApiCheckNumElems( this, 1 );
 			G_ErrorMsg();
 			return 0;
 		}
@@ -826,7 +826,7 @@ namespace UniLua
 			if( !Index2Addr( funcIndex, out addr ) )
 				return null;
 
-			Utl.ApiCheckNumElems( this, 1 );
+			LuaUtil.ApiCheckNumElems( this, 1 );
 
 			StkId val;
 			var name = AuxUpvalue(addr, n, out val);
@@ -879,10 +879,10 @@ namespace UniLua
 		{
 			StkId addr;
 			if( !Index2Addr( index, out addr ) )
-				Utl.ApiCheck( false, "table expected" );
+				LuaUtil.ApiCheck( false, "table expected" );
 
 			var tbl = addr.V.HValue();
-			Utl.ApiCheck( tbl != null, "table expected" );
+			LuaUtil.ApiCheck( tbl != null, "table expected" );
 
 			Top.V.SetObj(ref tbl.GetInt(n).V);
 			ApiIncrTop();
@@ -935,11 +935,11 @@ namespace UniLua
 
 		void ILuaAPI.RawSetI( int index, int n )
 		{
-			Utl.ApiCheckNumElems( this, 1 );
+			LuaUtil.ApiCheckNumElems( this, 1 );
 			StkId addr;
 			if( !Index2Addr( index, out addr ) )
-				Utl.InvalidIndex();
-			Utl.ApiCheck( addr.V.TtIsTable(), "table expected" );
+				LuaUtil.InvalidIndex();
+			LuaUtil.ApiCheck( addr.V.TtIsTable(), "table expected" );
 			var tbl = addr.V.HValue();
 			tbl.SetInt( n, ref Stack[Top.Index-1].V );
 			Top = Stack[Top.Index-1];
@@ -947,11 +947,11 @@ namespace UniLua
 
 		void ILuaAPI.RawSet( int index )
 		{
-			Utl.ApiCheckNumElems( this, 2 );
+			LuaUtil.ApiCheckNumElems( this, 2 );
 			StkId addr;
 			if( !Index2Addr( index, out addr ) )
-				Utl.InvalidIndex();
-			Utl.ApiCheck( addr.V.TtIsTable(), "table expected" );
+				LuaUtil.InvalidIndex();
+			LuaUtil.ApiCheck( addr.V.TtIsTable(), "table expected" );
 			var tbl = addr.V.HValue();
 			tbl.Set( ref Stack[Top.Index-2].V, ref Stack[Top.Index-1].V );
 			Top = Stack[Top.Index-2];
@@ -961,7 +961,7 @@ namespace UniLua
 		{
 			StkId addr;
 			if( !Index2Addr( index, out addr ) )
-				Utl.InvalidIndex();
+				LuaUtil.InvalidIndex();
 
 			Top.V.SetSValue(key);
 			var below = Top;
@@ -973,7 +973,7 @@ namespace UniLua
 		{
 			StkId addr;
 			if( !Index2Addr( index, out addr ) )
-				Utl.InvalidIndex();
+				LuaUtil.InvalidIndex();
 
 			StkId.inc(ref Top).V.SetSValue( key );
 			V_SetTable( addr, Stack[Top.Index-1], Stack[Top.Index-2] );
@@ -984,7 +984,7 @@ namespace UniLua
 		{
 			StkId addr;
 			if(! Index2Addr( index, out addr ) )
-				Utl.InvalidIndex();
+				LuaUtil.InvalidIndex();
 
 			var below = Stack[Top.Index - 1];
 			V_GetTable( addr, below, below );
@@ -993,9 +993,9 @@ namespace UniLua
 		void ILuaAPI.SetTable( int index )
 		{
 			StkId addr;
-			Utl.ApiCheckNumElems( this, 2 );
+			LuaUtil.ApiCheckNumElems( this, 2 );
 			if(! Index2Addr( index, out addr ) )
-				Utl.InvalidIndex();
+				LuaUtil.InvalidIndex();
 
 			var key = Stack[Top.Index - 2];
 			var val = Stack[Top.Index - 1];
@@ -1005,7 +1005,7 @@ namespace UniLua
 
 		void ILuaAPI.Concat( int n )
 		{
-			Utl.ApiCheckNumElems( this, n );
+			LuaUtil.ApiCheckNumElems( this, n );
 			if( n >= 2 )
 			{
 				V_Concat( n );
@@ -1125,18 +1125,18 @@ namespace UniLua
 		{
 			StkId addr1;
 			if( !Index2Addr( index1, out addr1 ) )
-				Utl.InvalidIndex();
+				LuaUtil.InvalidIndex();
 
 			StkId addr2;
 			if( !Index2Addr( index2, out addr2 ) )
-				Utl.InvalidIndex();
+				LuaUtil.InvalidIndex();
 
 			switch( op )
 			{
 				case LuaEq.LUA_OPEQ: return EqualObj( ref addr1.V, ref addr2.V, false );
 				case LuaEq.LUA_OPLT: return V_LessThan( addr1, addr2 );
 				case LuaEq.LUA_OPLE: return V_LessEqual( addr1, addr2 );
-				default: Utl.ApiCheck( false, "invalid option" ); return false;
+				default: LuaUtil.ApiCheck( false, "invalid option" ); return false;
 			}
 		}
 
@@ -1157,7 +1157,7 @@ namespace UniLua
 		{
 			StkId addr;
 			if( !Index2Addr( index, out addr ) )
-				Utl.InvalidIndex();
+				LuaUtil.InvalidIndex();
 
 			switch( addr.V.Tt )
 			{
@@ -1182,7 +1182,7 @@ namespace UniLua
 		{
 			StkId addr;
 			if( !Index2Addr( index, out addr ) )
-				Utl.InvalidIndex();
+				LuaUtil.InvalidIndex();
 
 			V_ObjLen( Top, addr );
 
@@ -1248,8 +1248,8 @@ namespace UniLua
 			else
 			{
 				// 带 UpValue 的 C# function
-				Utl.ApiCheckNumElems( this, n );
-				Utl.ApiCheck( n <= LuaLimits.MAXUPVAL, "upvalue index too large" );
+				LuaUtil.ApiCheckNumElems( this, n );
+				LuaUtil.ApiCheck( n <= LuaLimits.MAXUPVAL, "upvalue index too large" );
 
 				LuaCsClosureValue cscl = new LuaCsClosureValue( f, n );
 				int index = Top.Index - n;
@@ -1266,7 +1266,7 @@ namespace UniLua
 		{
 			StkId addr;
 			if( !Index2Addr( index, out addr ) )
-				Utl.InvalidIndex();
+				LuaUtil.InvalidIndex();
 
 			Top.V.SetObj(ref addr.V);
 			ApiIncrTop();
@@ -1305,7 +1305,7 @@ namespace UniLua
 		{
 			StkId addr;
 			if( !Index2Addr( index, out addr ) )
-				Utl.InvalidIndex();
+				LuaUtil.InvalidIndex();
 
 			LuaTable mt;
 			switch( addr.V.Tt )
@@ -1340,11 +1340,11 @@ namespace UniLua
 
 		bool ILuaAPI.SetMetaTable( int index )
 		{
-			Utl.ApiCheckNumElems( this, 1 );
+			LuaUtil.ApiCheckNumElems( this, 1 );
 
 			StkId addr;
 			if( !Index2Addr( index, out addr ) )
-				Utl.InvalidIndex();
+				LuaUtil.InvalidIndex();
 
 			var below = Stack[Top.Index - 1];
 			LuaTable mt;
@@ -1352,7 +1352,7 @@ namespace UniLua
 				mt = null;
 			else
 			{
-				Utl.ApiCheck( below.V.TtIsTable(), "table expected" );
+				LuaUtil.ApiCheck( below.V.TtIsTable(), "table expected" );
 				mt = below.V.HValue();
 			}
 
@@ -1412,7 +1412,7 @@ namespace UniLua
 			if( !Index2Addr( index, out addr ) )
 				return null;
 
-			Utl.Assert(addr.V.TtIsString());
+			LuaUtil.Assert(addr.V.TtIsString());
 			return addr.V.OValue as string;
 		}
 
@@ -1581,7 +1581,7 @@ namespace UniLua
 			if( index > 0 )
 			{
 				var addrIndex = ci.FuncIndex + index;
-				Utl.ApiCheck( index <= ci.TopIndex - (ci.FuncIndex + 1), "unacceptable index" );
+				LuaUtil.ApiCheck( index <= ci.TopIndex - (ci.FuncIndex + 1), "unacceptable index" );
 				if( addrIndex >= Top.Index ) {
 					addr = default(StkId);
 					return false;
@@ -1592,7 +1592,7 @@ namespace UniLua
 			}
 			else if( index > LuaDef.LUA_REGISTRYINDEX )
 			{
-				Utl.ApiCheck( index != 0 && -index <= Top.Index - (ci.FuncIndex + 1), "invalid index" );
+				LuaUtil.ApiCheck( index != 0 && -index <= Top.Index - (ci.FuncIndex + 1), "invalid index" );
 				addr = Stack[Top.Index + index];
 				return true;
 			}
@@ -1605,16 +1605,16 @@ namespace UniLua
 			else
 			{
 				index = LuaDef.LUA_REGISTRYINDEX - index;
-				Utl.ApiCheck( index <= LuaLimits.MAXUPVAL + 1, "upvalue index too large" );
+				LuaUtil.ApiCheck( index <= LuaLimits.MAXUPVAL + 1, "upvalue index too large" );
 				var func = Stack[ci.FuncIndex];
-				Utl.Assert(func.V.TtIsFunction());
+				LuaUtil.Assert(func.V.TtIsFunction());
 
 				if(func.V.ClIsLcsClosure()) {
 					addr = default(StkId);
 					return false;
 				}
 
-				Utl.Assert(func.V.ClIsCsClosure());
+				LuaUtil.Assert(func.V.ClIsCsClosure());
 				var clcs = func.V.ClCsValue();
 				if(index > clcs.Upvals.Length) {
 					addr = default(StkId);

@@ -1,7 +1,7 @@
 ﻿
 #define LUA_COMPAT_UNPACK
 
-namespace UniLua
+namespace CsharpLua
 {
 	using StringBuilder = System.Text.StringBuilder;
 

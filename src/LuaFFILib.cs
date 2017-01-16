@@ -3,9 +3,9 @@ using System.Text;
 using System.Reflection;
 using System.Collections.Generic;
 
-namespace UniLua
+namespace CsharpLua
 {
-	using ULDebug = UniLua.Tools.ULDebug;
+	using ULDebug = CsharpLua.Tools.CLDebug;
 
 	internal class LuaFFILib
 	{
@@ -568,13 +568,13 @@ namespace UniLua
 				var loadinfo = new StringLoadInfo( signature );
 
 				var parser = new FuncSignatureParser();
-				parser.Lexer = new LLex( lua, loadinfo, signature );
+				parser.Lexer = new LuaLex( lua, loadinfo, signature );
 				parser.Result = new FuncSignature();
 
 				return parser.parse( signature );
 			}
 
-			private LLex			Lexer;
+			private LuaLex			Lexer;
 			private FuncSignature	Result;
 
 			private FuncSignature parse( string signature )

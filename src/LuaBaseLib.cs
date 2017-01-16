@@ -1,8 +1,8 @@
 ﻿
-namespace UniLua
+namespace CsharpLua
 {
 	using System.Collections.Generic;
-	using ULDebug = UniLua.Tools.ULDebug;
+	using ULDebug = CsharpLua.Tools.CLDebug;
 	using StringBuilder = System.Text.StringBuilder;
 	using Char = System.Char;
 	using Int32 = System.Int32;

@@ -3,9 +3,9 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 
-using ULDebug = UniLua.Tools.ULDebug;
+using ULDebug = CsharpLua.Tools.CLDebug;
 
-namespace UniLua
+namespace CsharpLua
 {
 	using InstructionPtr = Pointer<Instruction>;
 
@@ -15,7 +15,7 @@ namespace UniLua
 		public BlockCnt	Block;
 		public LuaProto Proto;
 		public LuaState State;
-		public LLex		Lexer;
+		public LuaLex		Lexer;
 
 		public Dictionary<TValue, int> H;
 
@@ -189,7 +189,7 @@ namespace UniLua
 		{
 			var parser = new Parser();
 			parser.Lua = (LuaState)lua;
-			parser.Lexer = new LLex( lua, loadinfo, name );
+			parser.Lexer = new LuaLex( lua, loadinfo, name );
 
 			var topFuncState = new FuncState();
 			parser.MainFunc( topFuncState );
@@ -198,7 +198,7 @@ namespace UniLua
 
 		private const int 		MAXVARS = 200;
 
-		private LLex 			Lexer;
+		private LuaLex 			Lexer;
 		private FuncState 		CurFunc;
 		private List<VarDesc> 	ActVars;
 		private List<LabelDesc> PendingGotos;
@@ -380,7 +380,7 @@ namespace UniLua
 		private LocVar GetLocalVar( FuncState fs, int i )
 		{
 			int idx = ActVars[fs.FirstLocal + i].Index;
-			Utl.Assert( idx < fs.Proto.LocVars.Count );
+			LuaUtil.Assert( idx < fs.Proto.LocVars.Count );
 			return fs.Proto.LocVars[idx];
 		}
 
@@ -409,7 +409,7 @@ namespace UniLua
 		private void CloseGoto( int g, LabelDesc label )
 		{
 			var gt = PendingGotos[g];
-			Utl.Assert( gt.Name == label.Name );
+			LuaUtil.Assert( gt.Name == label.Name );
 			if( gt.NumActVar < label.NumActVar )
 			{
 				var v = GetLocalVar( CurFunc, gt.NumActVar );
@@ -523,7 +523,7 @@ namespace UniLua
 			block.HasUpValue 	= false;
 			block.Previous 		= fs.Block;
 			fs.Block 			= block;
-			Utl.Assert( fs.FreeReg == fs.NumActVar );
+			LuaUtil.Assert( fs.FreeReg == fs.NumActVar );
 		}
 
 		private void LeaveBlock( FuncState fs )
@@ -542,7 +542,7 @@ namespace UniLua
 
 			fs.Block = block.Previous;
 			RemoveVars( fs, block.NumActVar );
-			Utl.Assert( block.NumActVar == fs.NumActVar );
+			LuaUtil.Assert( block.NumActVar == fs.NumActVar );
 			fs.FreeReg =  fs.NumActVar; // free registers
 			ActiveLabels.RemoveRange( block.FirstLabel,
 				ActiveLabels.Count - block.FirstLabel );
@@ -790,7 +790,7 @@ namespace UniLua
 			var e = new ExpDesc();
 			Expr( e );
 			Coder.Exp2NextReg( CurFunc, e );
-			Utl.Assert( e.Kind == ExpKind.VNONRELOC );
+			LuaUtil.Assert( e.Kind == ExpKind.VNONRELOC );
 			return e.Info;
 		}
 
@@ -1093,7 +1093,7 @@ namespace UniLua
 					{
 						var pi = fs.GetCode(e);
 						pi.Value = pi.Value.SET_OPCODE( OpCode.OP_TAILCALL );
-						Utl.Assert( pi.Value.GETARG_A() == fs.NumActVar );
+						LuaUtil.Assert( pi.Value.GETARG_A() == fs.NumActVar );
 					}
 					first = fs.NumActVar;
 					nret = LuaDef.LUA_MULTRET;
@@ -1108,7 +1108,7 @@ namespace UniLua
 					{
 						Coder.Exp2NextReg( fs, e ); // values must go to the `stack'
 						first = fs.NumActVar;
-						Utl.Assert( nret == fs.FreeReg - first );
+						LuaUtil.Assert( nret == fs.FreeReg - first );
 					}
 				}
 			}
@@ -1208,7 +1208,7 @@ namespace UniLua
 			// ULDebug.Log( "MaxStackSize: " + CurFunc.Proto.MaxStackSize );
 			// ULDebug.Log( "FreeReg: " + CurFunc.FreeReg );
 			// ULDebug.Log( "NumActVar: " + CurFunc.NumActVar );
-			Utl.Assert( CurFunc.Proto.MaxStackSize >= CurFunc.FreeReg &&
+			LuaUtil.Assert( CurFunc.Proto.MaxStackSize >= CurFunc.FreeReg &&
 						CurFunc.FreeReg >= CurFunc.NumActVar );
 			CurFunc.FreeReg = CurFunc.NumActVar; // free registers
 			LeaveLevel();
@@ -1280,7 +1280,7 @@ namespace UniLua
 			{
 				ExpDesc key = new ExpDesc();
 				SingleVarAux( CurFunc, LuaDef.LUA_ENV, e, true );
-				Utl.Assert( e.Kind == ExpKind.VLOCAL ||
+				LuaUtil.Assert( e.Kind == ExpKind.VLOCAL ||
 							e.Kind == ExpKind.VUPVAL );
 				CodeString( key, name );
 				Coder.Indexed( CurFunc, e, key );
@@ -1631,7 +1631,7 @@ namespace UniLua
 			Coder.Exp2NextReg( fs, t );
 			CheckNext( (int)'{' );
 			do {
-				Utl.Assert( cc.ExpLastItem.Kind == ExpKind.VVOID ||
+				LuaUtil.Assert( cc.ExpLastItem.Kind == ExpKind.VVOID ||
 							cc.NumToStore > 0 );
 				if( Lexer.Token.TokenType == (int)'}' )
 					break;
@@ -1754,7 +1754,7 @@ namespace UniLua
 				}
 			}
 
-			Utl.Assert( e.Kind == ExpKind.VNONRELOC );
+			LuaUtil.Assert( e.Kind == ExpKind.VNONRELOC );
 			int baseReg = e.Info;
 			int nparams;
 			if( HasMultiRet( args.Kind ) )

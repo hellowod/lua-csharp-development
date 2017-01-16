@@ -2,7 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 
-namespace UniLua
+namespace CsharpLua
 {
 	public delegate string PathHook(string filename);
 	public class LuaFile

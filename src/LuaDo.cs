@@ -2,9 +2,9 @@
 // #define DEBUG_D_PRE_CALL
 // #define DEBUG_D_POS_CALL
 
-namespace UniLua
+namespace CsharpLua
 {
-	using ULDebug = UniLua.Tools.ULDebug;
+	using ULDebug = CsharpLua.Tools.CLDebug;
 	using InstructionPtr = Pointer<Instruction>;
 	using Exception = System.Exception;
 
@@ -126,7 +126,7 @@ namespace UniLua
 
 			if(func.V.ClIsLuaClosure()) {
 				var cl = func.V.ClLValue();
-				Utl.Assert(cl != null);
+				LuaUtil.Assert(cl != null);
 				var p = cl.Proto;
 
 				D_CheckStack(p.MaxStackSize + p.NumParams);
@@ -144,7 +144,7 @@ namespace UniLua
 				CI.FuncIndex = func.Index;
 				CI.BaseIndex = stackBase;
 				CI.TopIndex  = stackBase + p.MaxStackSize;
-				Utl.Assert(CI.TopIndex <= StackLast);
+				LuaUtil.Assert(CI.TopIndex <= StackLast);
 				CI.SavedPc = new InstructionPtr( p.Code, 0 );
 				CI.CallStatus = CallStatus.CIST_LUA;
 
@@ -155,7 +155,7 @@ namespace UniLua
 
 			if(func.V.ClIsCsClosure()) {
 				var cscl = func.V.ClCsValue();
-				Utl.Assert(cscl != null);
+				LuaUtil.Assert(cscl != null);
 
 				D_CheckStack(LuaDef.LUA_MINSTACK);
 				func = Stack[funcIndex];
@@ -255,7 +255,7 @@ namespace UniLua
 			// func (base)fixed-p1 fixed-p2 (reserved...) top
 
 			int NumFixArgs = p.NumParams;
-			Utl.Assert( actual >= NumFixArgs, "AdjustVarargs (actual >= NumFixArgs) is false" );
+			LuaUtil.Assert( actual >= NumFixArgs, "AdjustVarargs (actual >= NumFixArgs) is false" );
 
 			int fixedArg = Top.Index - actual; 	// first fixed argument
 			int stackBase = Top.Index;		// final position of first argument
@@ -320,7 +320,7 @@ namespace UniLua
 
 		private void D_ReallocStack(int size)
 		{
-			Utl.Assert(size <= LuaConf.LUAI_MAXSTACK || size == ERRORSTACKSIZE);
+			LuaUtil.Assert(size <= LuaConf.LUAI_MAXSTACK || size == ERRORSTACKSIZE);
 			var newStack = new StkId[size];
 			int i = 0;
 			for( ; i<Stack.Length; ++i) {

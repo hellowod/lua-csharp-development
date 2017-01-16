@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace UniLua
+namespace CsharpLua
 {
 	internal class ByteStringBuilder
 	{

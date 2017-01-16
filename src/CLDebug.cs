@@ -1,15 +1,15 @@
 ﻿using System;
 
-namespace UniLua.Tools
+namespace CsharpLua.Tools
 {
-	public class ULDebug
+	public class CLDebug
 	{
 		public static System.Action<object> Log = NoAction;
 		public static System.Action<object> LogError = NoAction;
 
 		private static void NoAction(object msg) { }
 
-		static ULDebug()
+		static CLDebug()
 		{
             Log = LogMessage;
             LogError = ErrorMessage;

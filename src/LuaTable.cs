@@ -4,9 +4,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace UniLua
+namespace CsharpLua
 {
-	using ULDebug = UniLua.Tools.ULDebug;
+	using ULDebug = CsharpLua.Tools.CLDebug;
 
 	public class LuaTable {
 		public LuaTable MetaTable;
@@ -338,7 +338,7 @@ namespace UniLua
 
 		private void SetArraryVector(int size)
 		{
-			Utl.Assert(size >= ArrayPart.Length);
+			LuaUtil.Assert(size >= ArrayPart.Length);
 
 			var newArrayPart = new StkId[size];
 			int i = 0;
@@ -405,7 +405,7 @@ namespace UniLua
 		};
 		private int CeilLog2(int x)
 		{
-			Utl.Assert(x > 0);
+			LuaUtil.Assert(x > 0);
 			int l = 0;
 			x--;
 			while(x >= 256) { l+=8; x>>=8; }
@@ -476,7 +476,7 @@ namespace UniLua
 				if(a == nasize) { break; } // all elements already conted
 			}
 			nasize = n;
-			Utl.Assert(nasize/2 <= na && na <= nasize);
+			LuaUtil.Assert(nasize/2 <= na && na <= nasize);
 			return na;
 		}
 
@@ -530,7 +530,7 @@ namespace UniLua
 					return NewTableKey(ref k);
 				}
 
-				Utl.Assert(n != DummyNode);
+				LuaUtil.Assert(n != DummyNode);
 				var othern = GetHashNode(ref mp.Key.V);
 				// is colliding node out of its main position?
 				if(othern != mp) {
@@ -549,7 +549,7 @@ namespace UniLua
 			}
 
 			mp.Key.V.SetObj(ref k);
-			Utl.Assert(mp.Val.V.TtIsNil());
+			LuaUtil.Assert(mp.Val.V.TtIsNil());
 			return mp.Val;
 		}
 

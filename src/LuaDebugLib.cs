@@ -1,5 +1,5 @@
 ﻿
-namespace UniLua
+namespace CsharpLua
 {
 	internal class LuaDebugLib
 	{

@@ -1,5 +1,5 @@
 ﻿
-namespace UniLua
+namespace CsharpLua
 {
 	using Math = System.Math;
 	using Double = System.Double;

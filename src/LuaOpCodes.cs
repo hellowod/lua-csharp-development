@@ -1,5 +1,5 @@
 ﻿
-namespace UniLua
+namespace CsharpLua
 {
 	using System.Collections.Generic;
 

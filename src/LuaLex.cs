@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 using NumberStyles = System.Globalization.NumberStyles;
 
-namespace UniLua
+namespace CsharpLua
 {
     public class LLexException : Exception
     {
@@ -154,7 +154,7 @@ namespace UniLua
         }
     }
 
-    public class LLex
+    public class LuaLex
     {
         public const char EOZ = Char.MaxValue;
 
@@ -178,7 +178,7 @@ namespace UniLua
         }
 
 		private static Dictionary<string, TK> ReservedWordDict;
-		static LLex()
+		static LuaLex()
 		{
 			ReservedWordDict = new Dictionary<string, TK>();
 			ReservedWordDict.Add("and", TK.AND);
@@ -205,7 +205,7 @@ namespace UniLua
 			ReservedWordDict.Add("while", TK.WHILE);
 		}
 
-        public LLex( ILuaState lua, ILoadInfo loadinfo, string name )
+        public LuaLex( ILuaState lua, ILoadInfo loadinfo, string name )
         {
 			Lua			= (LuaState)lua;
             LoadInfo    = loadinfo;
@@ -235,7 +235,7 @@ namespace UniLua
 
 		public Token GetLookAhead()
 		{
-			Utl.Assert( LookAhead == null );
+			LuaUtil.Assert( LookAhead == null );
 			LookAhead = _Lex();
 			return LookAhead;
 		}
@@ -513,7 +513,7 @@ namespace UniLua
         private double _ReadNumber()
         {
 			var expo = new char[] { 'E', 'e' };
-			Utl.Assert( _CurrentIsDigit() );
+			LuaUtil.Assert( _CurrentIsDigit() );
 			var first = Current;
 			_SaveAndNext();
 			if( first == '0' && (Current == 'X' || Current == 'x'))

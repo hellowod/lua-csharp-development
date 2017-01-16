@@ -16,9 +16,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace UniLua
+namespace CsharpLua
 {
-	using ULDebug = UniLua.Tools.ULDebug;
+	using ULDebug = CsharpLua.Tools.CLDebug;
 	using StringBuilder = System.Text.StringBuilder;
 
 	public partial class LuaState
@@ -63,7 +63,7 @@ namespace UniLua
 			ExecuteEnvironment env;
 			CallInfo ci = CI;
 newframe:
-			Utl.Assert(ci == CI);
+			LuaUtil.Assert(ci == CI);
 			var cl = Stack[ci.FuncIndex].V.ClLValue();
 
 			env.Stack = Stack;
@@ -140,7 +140,7 @@ newframe:
 
 					case OpCode.OP_LOADKX:
 					{
-						Utl.Assert( ci.SavedPc.Value.GET_OPCODE() == OpCode.OP_EXTRAARG );
+						LuaUtil.Assert( ci.SavedPc.Value.GET_OPCODE() == OpCode.OP_EXTRAARG );
 						var rb = env.K[ci.SavedPc.ValueInc.GETARG_Ax()];
 						ra.V.SetObj(ref rb.V);
 						break;
@@ -491,7 +491,7 @@ newframe:
 						int b = i.GETARG_B();
 						if( b != 0) { Top = Stack[ra.Index + b]; } 	// else previous instruction set top
 						
-						Utl.Assert( i.GETARG_C() - 1 == LuaDef.LUA_MULTRET );
+						LuaUtil.Assert( i.GETARG_C() - 1 == LuaDef.LUA_MULTRET );
 
 						var called = D_PreCall( ra, LuaDef.LUA_MULTRET );
 
@@ -532,7 +532,7 @@ newframe:
 							ci = CI = oci;
 
 							ocl = ofunc.V.ClLValue();
-							Utl.Assert(Top.Index == oci.BaseIndex + ocl.Proto.MaxStackSize);
+							LuaUtil.Assert(Top.Index == oci.BaseIndex + ocl.Proto.MaxStackSize);
 
 							goto newframe;
 						}
@@ -628,7 +628,7 @@ newframe:
 						ULDebug.Log( "[VM] ============================================================ OP_TFORCALL Instruction: " + i );
 #endif
 
-						Utl.Assert( i.GET_OPCODE() == OpCode.OP_TFORLOOP );
+						LuaUtil.Assert( i.GET_OPCODE() == OpCode.OP_TFORLOOP );
 						goto l_tforloop;
 					}
 
@@ -657,12 +657,12 @@ l_tforloop:
 						if( n == 0 ) n = (Top.Index - ra.Index) - 1;
 						if( c == 0 )
 						{
-							Utl.Assert( ci.SavedPc.Value.GET_OPCODE() == OpCode.OP_EXTRAARG );
+							LuaUtil.Assert( ci.SavedPc.Value.GET_OPCODE() == OpCode.OP_EXTRAARG );
 							c = ci.SavedPc.ValueInc.GETARG_Ax();
 						}
 
 						var tbl = ra.V.HValue();
-						Utl.Assert( tbl != null );
+						LuaUtil.Assert( tbl != null );
 
 						int last = ((c-1) * LuaDef.LFIELDS_PER_FLUSH) + n;
 						int rai = ra.Index;
@@ -731,7 +731,7 @@ l_tforloop:
 
 					case OpCode.OP_EXTRAARG:
 					{
-						Utl.Assert( false );
+						LuaUtil.Assert( false );
 						V_NotImplemented( i );
 						break;
 					}
@@ -882,7 +882,7 @@ calltm:
 
 		private void V_Concat( int total )
 		{
-			Utl.Assert( total >= 2 );
+			LuaUtil.Assert( total >= 2 );
 
 			do
 			{
@@ -1112,7 +1112,7 @@ calltm:
 					bool res = !IsFalse(ref Stack[Top.Index-1].V);
 					Top = Stack[Top.Index-1];
 					// metamethod should not be called when operand is K
-					Utl.Assert( !Instruction.ISK( i.GETARG_B() ) );
+					LuaUtil.Assert( !Instruction.ISK( i.GETARG_B() ) );
 					if( op == OpCode.OP_LE && // `<=' using `<' instead?
 						T_GetTMByObj(ref Stack[stackBase + i.GETARG_B()].V, TMS.TM_LE ).V.TtIsNil() )
 					{
@@ -1120,7 +1120,7 @@ calltm:
 					}
 
 					var ci = BaseCI[ciIndex];
-					Utl.Assert( ci.SavedPc.Value.GET_OPCODE() == OpCode.OP_JMP );
+					LuaUtil.Assert( ci.SavedPc.Value.GET_OPCODE() == OpCode.OP_JMP );
 					if( (res ? 1 : 0) != i.GETARG_A() )
 					if( (i.GETARG_A() == 0) == res ) // condition failed?
 					{
@@ -1152,7 +1152,7 @@ calltm:
 				case OpCode.OP_TFORCALL:
 				{
 					var ci = BaseCI[ciIndex];
-					Utl.Assert( ci.SavedPc.Value.GET_OPCODE() == OpCode.OP_TFORLOOP );
+					LuaUtil.Assert( ci.SavedPc.Value.GET_OPCODE() == OpCode.OP_TFORLOOP );
 					Top = Stack[ci.TopIndex]; // restore top
 					break;
 				}
@@ -1171,7 +1171,7 @@ calltm:
 					break;
 
 				default:
-					Utl.Assert( false );
+					LuaUtil.Assert( false );
 					break;
 			}
 		}
@@ -1203,7 +1203,7 @@ calltm:
 
 		private bool V_EqualObject( ref TValue t1, ref TValue t2, bool rawEq )
 		{
-			Utl.Assert( t1.Tt == t2.Tt );
+			LuaUtil.Assert( t1.Tt == t2.Tt );
 			StkId tm = null;
 			switch( t1.Tt )
 			{

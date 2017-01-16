@@ -1,5 +1,5 @@
 ﻿
-namespace UniLua
+namespace CsharpLua
 {
 	public class LuaDebug
 	{
@@ -48,7 +48,7 @@ namespace UniLua
 				ci = null;
 				func = Stack[Top.Index - 1];
 
-				Utl.ApiCheck(func.V.TtIsFunction(), "function expected");
+				LuaUtil.ApiCheck(func.V.TtIsFunction(), "function expected");
 				pos++;
 
 				Top = Stack[Top.Index-1];
@@ -57,7 +57,7 @@ namespace UniLua
 			{
 				ci = BaseCI[ar.ActiveCIIndex];
 				func = Stack[ci.FuncIndex];
-				Utl.Assert(Stack[ci.FuncIndex].V.TtIsFunction());
+				LuaUtil.Assert(Stack[ci.FuncIndex].V.TtIsFunction());
 			}
 
 			// var IsClosure( func.Value ) ? func.Value
@@ -94,7 +94,7 @@ namespace UniLua
 					}
 					case 'u':
 					{
-						Utl.Assert(func.V.TtIsFunction());
+						LuaUtil.Assert(func.V.TtIsFunction());
 						if(func.V.ClIsLuaClosure()) {
 							var lcl = func.V.ClLValue();
 							ar.NumUps = lcl.Upvals.Length;
@@ -149,7 +149,7 @@ namespace UniLua
 
 		private void CollectValidLines( StkId func )
 		{
-			Utl.Assert(func.V.TtIsFunction());
+			LuaUtil.Assert(func.V.TtIsFunction());
 			if(func.V.ClIsLuaClosure()) {
 				var lcl = func.V.ClLValue();
 				var p = lcl.Proto;
@@ -219,7 +219,7 @@ namespace UniLua
 
 		private void FuncInfo( LuaDebug ar, StkId func )
 		{
-			Utl.Assert(func.V.TtIsFunction());
+			LuaUtil.Assert(func.V.TtIsFunction());
 			if(func.V.ClIsLuaClosure()) {
 				var lcl = func.V.ClLValue();
 				var p = lcl.Proto;
@@ -297,7 +297,7 @@ namespace UniLua
 		private string GetUpvalueName( CallInfo ci, StkId o, out string name )
 		{
 			var func = Stack[ci.FuncIndex];
-			Utl.Assert(func.V.TtIsFunction() && func.V.ClIsLuaClosure());
+			LuaUtil.Assert(func.V.TtIsFunction() && func.V.ClIsLuaClosure());
 			var lcl = func.V.ClLValue();
 			for(int i=0; i<lcl.Upvals.Length; ++i) {
 				if( lcl.Upvals[i].V == o ) {

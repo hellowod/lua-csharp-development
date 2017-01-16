@@ -1,11 +1,11 @@
 ﻿
 // #define DEBUG_DUMMY_TVALUE_MODIFY
 
-namespace UniLua
+namespace CsharpLua
 {
 	using System;
 	using System.Collections.Generic;
-	using ULDebug = UniLua.Tools.ULDebug;
+	using ULDebug = CsharpLua.Tools.CLDebug;
 
 	public struct TValue
 	{
@@ -356,9 +356,9 @@ namespace UniLua
 
 			int pos = 0;
 			if( s.Contains("x") || s.Contains("X") )
-				result = Utl.StrX2Number( s, ref pos );
+				result = LuaUtil.StrX2Number( s, ref pos );
 			else
-				result = Utl.Str2Number( s, ref pos );
+				result = LuaUtil.Str2Number( s, ref pos );
 
 			if( pos == 0 )
 				return false; // nothing recognized
@@ -409,7 +409,7 @@ namespace UniLua
 
 		internal int GetCurrentLine(CallInfo ci)
 		{
-			Utl.Assert(ci.IsLua);
+			LuaUtil.Assert(ci.IsLua);
 			var cl = Stack[ci.FuncIndex].V.ClLValue();
 			return cl.Proto.GetFuncLine(ci.CurrentPc);
 		}

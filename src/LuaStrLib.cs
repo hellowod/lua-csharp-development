@@ -1,5 +1,5 @@
 ﻿
-namespace UniLua
+namespace CsharpLua
 {
 	using StringBuilder = System.Text.StringBuilder;
 	using Char = System.Char;

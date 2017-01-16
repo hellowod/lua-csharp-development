@@ -5,10 +5,10 @@
 
 using System.Collections.Generic;
 
-namespace UniLua
+namespace CsharpLua
 {
 	using InstructionPtr = Pointer<Instruction>;
-	using ULDebug = UniLua.Tools.ULDebug;
+	using ULDebug = CsharpLua.Tools.CLDebug;
 
 	public struct Pointer<T>
 	{
@@ -107,7 +107,7 @@ namespace UniLua
 		{
 			get
 			{
-				Utl.Assert( IsLua );
+				LuaUtil.Assert( IsLua );
 				return SavedPc.Index - 1;
 			}
 		}
@@ -212,7 +212,7 @@ namespace UniLua
 			StkId.inc(ref Top);
 			// ULDebug.Log( "[ApiIncrTop] ==== Top.Index:" + Top.Index );
 			// ULDebug.Log( "[ApiIncrTop] ==== CI.Top.Index:" + CI.Top.Index );
-			Utl.ApiCheck( Top.Index <= CI.TopIndex, "stack overflow" );
+			LuaUtil.ApiCheck( Top.Index <= CI.TopIndex, "stack overflow" );
 		}
 
 		private void InitStack()

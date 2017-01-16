@@ -3,7 +3,7 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 
-namespace UniLua
+namespace CsharpLua
 {
 	public enum DumpStatus
 	{
@@ -135,7 +135,7 @@ namespace UniLua
 						DumpString(k.V.SValue());
 						break;
 					default:
-						Utl.Assert(false);
+						LuaUtil.Assert(false);
 						break;
 				}
 			});

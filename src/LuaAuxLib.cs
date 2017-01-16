@@ -1,11 +1,9 @@
 ﻿
-namespace UniLua
+namespace CsharpLua
 {
-	using System;
-	using System.IO;
-	using System.Collections.Generic;
+    using System;
 
-	public struct NameFuncPair
+    public struct NameFuncPair
 	{
 		public string Name;
 		public CSharpFunctionDelegate Func;

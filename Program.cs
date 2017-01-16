@@ -1,5 +1,5 @@
 ﻿using System;
-using UniLua;
+using CsharpLua;
 
 namespace CsharpLua
 {

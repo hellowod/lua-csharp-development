@@ -43,12 +43,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="src\ByteString.cs" />
-    <Compile Include="src\Coder.cs" />
-    <Compile Include="src\Common.cs" />
-    <Compile Include="src\Do.cs" />
-    <Compile Include="src\Dump.cs" />
-    <Compile Include="src\LLex.cs" />
+    <Compile Include="src\LuaByteString.cs" />
+    <Compile Include="src\LuaCoder.cs" />
+    <Compile Include="src\LuaConf.cs" />
+    <Compile Include="src\LuaDo.cs" />
+    <Compile Include="src\LuaDump.cs" />
+    <Compile Include="src\LuaLex.cs" />
     <Compile Include="src\LuaAPI.cs" />
     <Compile Include="src\LuaAuxLib.cs" />
     <Compile Include="src\LuaBaseLib.cs" />
@@ -69,15 +69,15 @@
     <Compile Include="src\LuaStrLib.cs" />
     <Compile Include="src\LuaTable.cs" />
     <Compile Include="src\LuaTableLib.cs" />
-    <Compile Include="src\OpCodes.cs" />
-    <Compile Include="src\Parser.cs" />
+    <Compile Include="src\LuaOpCodes.cs" />
+    <Compile Include="src\LuaParser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="src\TagMethod.cs" />
-    <Compile Include="src\ULDebug.cs" />
-    <Compile Include="src\Undump.cs" />
-    <Compile Include="src\Util.cs" />
-    <Compile Include="src\VM.cs" />
+    <Compile Include="src\LuaTM.cs" />
+    <Compile Include="src\CLDebug.cs" />
+    <Compile Include="src\LuaUndump.cs" />
+    <Compile Include="src\LuaUtil.cs" />
+    <Compile Include="src\LuaVM.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
