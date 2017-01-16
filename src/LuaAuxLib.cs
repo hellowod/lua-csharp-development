@@ -494,8 +494,9 @@ namespace UniLua
 		public ThreadStatus L_DoFile( string filename )
 		{
 			var status = L_LoadFile( filename );
-			if( status != ThreadStatus.LUA_OK )
-				return status;
+			if( status != ThreadStatus.LUA_OK) {
+                return status;
+            }
 			return API.PCall( 0, LuaDef.LUA_MULTRET, 0 );
 		}
 
@@ -535,22 +536,6 @@ namespace UniLua
 			}
 			return API.ToString( -1 );
 		}
-
-		// private static class LibLoadInfo
-		// {
-		// 	public static List<NameFuncPair> Items;
-
-		// 	static LibLoadInfo()
-		// 	{
-		// 		Items = new List<NameFuncPair>();
-		// 		Add( "_G", LuaState.LuaOpen_Base );
-		// 	}
-
-		// 	private static void Add( string name, CSharpFunctionDelegate loadFunc )
-		// 	{
-		// 		Items.Add( new NameFuncPair { Name=name, LoadFunc=loadFunc } );
-		// 	}
-		// }
 
 		public void L_OpenLibs()
 		{

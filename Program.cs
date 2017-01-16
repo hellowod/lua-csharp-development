@@ -1,7 +1,7 @@
 ﻿using System;
 using UniLua;
 
-namespace cslua
+namespace CsharpLua
 {
     class Program
     {
