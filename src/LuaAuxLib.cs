@@ -422,7 +422,7 @@ namespace CsharpLua
 
         public ThreadStatus L_LoadFileX(string filename, string mode)
         {
-            var status = ThreadStatus.LUA_OK;
+            ThreadStatus status = ThreadStatus.LUA_OK;
             if (filename == null) {
                 // 暂不实现从 stdin 输入
                 throw new System.NotImplementedException();
@@ -431,13 +431,11 @@ namespace CsharpLua
             int fnameindex = API.GetTop() + 1;
             API.PushString("@" + filename);
             try {
-                using (var loadinfo = LuaFile.OpenFile(filename)) {
-                    loadinfo.SkipComment();
-                    status = API.Load(loadinfo, API.ToString(-1), mode);
-                }
+                FileLoadInfo loadinfo = LuaFile.OpenFile(filename);
+                loadinfo.SkipComment();
+                status = API.Load(loadinfo, API.ToString(-1), mode);
             } catch (LuaRuntimeException e) {
-                API.PushString(string.Format("cannot open {0}: {1}",
-                    filename, e.Message));
+                API.PushString(string.Format("cannot open {0}: {1}",  filename, e.Message));
                 return ThreadStatus.LUA_ERRFILE;
             }
 
@@ -453,14 +451,15 @@ namespace CsharpLua
         public ThreadStatus L_DoString(string s)
         {
             var status = L_LoadString(s);
-            if (status != ThreadStatus.LUA_OK)
+            if (status != ThreadStatus.LUA_OK) {
                 return status;
+            }
             return API.PCall(0, LuaDef.LUA_MULTRET, 0);
         }
 
         public ThreadStatus L_DoFile(string filename)
         {
-            var status = L_LoadFile(filename);
+            ThreadStatus status = L_LoadFile(filename);
             if (status != ThreadStatus.LUA_OK) {
                 return status;
             }

@@ -8,8 +8,8 @@ namespace CsharpLua
 
         static void Main(string[] args)
         {
-            ILuaState lua = new LuaState();
-            lua.L_OpenLibs();
+            ILuaState L = new LuaState();
+            L.L_OpenLibs();
 
             if(args.Length > 0) {
                 ScriptFile = args[0];
@@ -17,9 +17,9 @@ namespace CsharpLua
                 throw new Exception("args is null");
             }
 
-            ThreadStatus status = lua.L_DoFile(ScriptFile);
+            ThreadStatus status = L.L_DoFile(ScriptFile);
             if (status != ThreadStatus.LUA_OK) {
-                throw new Exception(lua.ToString(-1));
+                throw new Exception(L.ToString(-1));
             }
         }
     }
