@@ -74,7 +74,7 @@
     <Compile Include="src\LuaTableLib.cs" />
     <Compile Include="src\LuaOpCodes.cs" />
     <Compile Include="src\LuaParser.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Lua.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\LuaTM.cs" />
     <Compile Include="src\CLDebug.cs" />

@@ -4,8 +4,8 @@ namespace CsharpLua.Tools
 {
 	public class CLDebug
 	{
-		public static System.Action<object> Log = NoAction;
-		public static System.Action<object> LogError = NoAction;
+		public static Action<object> Log = NoAction;
+		public static Action<object> LogError = NoAction;
 
 		private static void NoAction(object msg) { }
 
