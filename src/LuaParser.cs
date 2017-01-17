@@ -225,11 +225,11 @@ namespace CsharpLua
         {
             FuncState fs = CurFunc.Prev;
             InitExp(v, ExpKind.VRELOCABLE,
-                Coder.CodeABx(fs, OpCode.OP_CLOSURE, 0,
+                LuaCoder.CodeABx(fs, OpCode.OP_CLOSURE, 0,
                     (uint)(fs.Proto.P.Count - 1)));
 
             // fix it at stack top
-            Coder.Exp2NextReg(fs, v);
+            LuaCoder.Exp2NextReg(fs, v);
         }
 
         private void OpenFunc(FuncState fs, BlockCnt block)
@@ -241,7 +241,7 @@ namespace CsharpLua
 
             fs.Pc = 0;
             fs.LastTarget = 0;
-            fs.Jpc = Coder.NO_JUMP;
+            fs.Jpc = LuaCoder.NO_JUMP;
             fs.FreeReg = 0;
             fs.NumActVar = 0;
             fs.FirstLocal = ActVars.Count;
@@ -255,7 +255,7 @@ namespace CsharpLua
 
         private void CloseFunc()
         {
-            Coder.Ret(CurFunc, 0, 0);
+            LuaCoder.Ret(CurFunc, 0, 0);
 
             LeaveBlock(CurFunc);
 
@@ -300,13 +300,16 @@ namespace CsharpLua
             if (Lexer.Token.TokenType == tokenType) {
                 Lexer.Next();
                 return true;
-            } else return false;
+            } else {
+                return false;
+            }
         }
 
         private void Check(int tokenType)
         {
-            if (Lexer.Token.TokenType != tokenType)
+            if (Lexer.Token.TokenType != tokenType) {
                 ErrorExpected(tokenType);
+            }
         }
 
         private void CheckNext(int tokenType)
@@ -317,15 +320,15 @@ namespace CsharpLua
 
         private void CheckCondition(bool cond, string msg)
         {
-            if (!cond)
+            if (!cond) {
                 Lexer.SyntaxError(msg);
+            }
         }
 
         private void EnterLevel()
         {
             ++Lua.NumCSharpCalls;
-            CheckLimit(CurFunc, Lua.NumCSharpCalls,
-                LuaLimits.LUAI_MAXCCALLS, "C# levels");
+            CheckLimit(CurFunc, Lua.NumCSharpCalls, LuaLimits.LUAI_MAXCCALLS, "C# levels");
         }
 
         private void LeaveLevel()
@@ -342,18 +345,16 @@ namespace CsharpLua
         private void ErrorLimit(FuncState fs, int limit, string what)
         {
             int line = fs.Proto.LineDefined;
-            string where = (line == 0)
-                ? "main function"
-                : string.Format("function at line {0}", line);
-            string msg = string.Format("too many {0} (limit is {1}) in {2}",
-                what, limit, where);
+            string where = (line == 0) ? "main function" : string.Format("function at line {0}", line);
+            string msg = string.Format("too many {0} (limit is {1}) in {2}", what, limit, where);
             Lexer.SyntaxError(msg);
         }
 
         private void CheckLimit(FuncState fs, int v, int l, string what)
         {
-            if (v > l)
+            if (v > l) {
                 ErrorLimit(fs, l, what);
+            }
         }
 
         private int RegisterLocalVar(string varname)
@@ -368,11 +369,10 @@ namespace CsharpLua
 
         private VarDesc NewLocalVar(string name)
         {
-            var fs = CurFunc;
+            FuncState fs = CurFunc;
             int reg = RegisterLocalVar(name);
-            CheckLimit(fs, ActVars.Count + 1 - fs.FirstLocal,
-                MAXVARS, "local variables");
-            var v = new VarDesc();
+            CheckLimit(fs, ActVars.Count + 1 - fs.FirstLocal, MAXVARS, "local variables");
+            VarDesc v = new VarDesc();
             v.Index = reg;
             return v;
         }
@@ -386,19 +386,19 @@ namespace CsharpLua
 
         private void AdjustLocalVars(int nvars)
         {
-            var fs = CurFunc;
+            FuncState fs = CurFunc;
             fs.NumActVar += nvars;
             for (; nvars > 0; --nvars) {
-                var v = GetLocalVar(fs, fs.NumActVar - nvars);
+                LocVar v = GetLocalVar(fs, fs.NumActVar - nvars);
                 v.StartPc = fs.Pc;
             }
         }
 
         private void RemoveVars(FuncState fs, int toLevel)
         {
-            var len = fs.NumActVar - toLevel;
+            int len = fs.NumActVar - toLevel;
             while (fs.NumActVar > toLevel) {
-                var v = GetLocalVar(fs, --fs.NumActVar);
+                LocVar v = GetLocalVar(fs, --fs.NumActVar);
                 v.EndPc = fs.Pc;
             }
             ActVars.RemoveRange(ActVars.Count - len, len);
@@ -409,13 +409,11 @@ namespace CsharpLua
             var gt = PendingGotos[g];
             LuaUtil.Assert(gt.Name == label.Name);
             if (gt.NumActVar < label.NumActVar) {
-                var v = GetLocalVar(CurFunc, gt.NumActVar);
-                var msg = string.Format(
-                    "<goto {0}> at line {1} jumps into the scope of local '{2}'",
-                    gt.Name, gt.Line, v.VarName);
+                LocVar v = GetLocalVar(CurFunc, gt.NumActVar);
+                string msg = string.Format("<goto {0}> at line {1} jumps into the scope of local '{2}'", gt.Name, gt.Line, v.VarName);
                 SemanticError(msg);
             }
-            Coder.PatchList(CurFunc, gt.Pc, label.Pc);
+            LuaCoder.PatchList(CurFunc, gt.Pc, label.Pc);
 
             PendingGotos.RemoveAt(g);
         }
@@ -432,7 +430,7 @@ namespace CsharpLua
                 if (label.Name == gt.Name) {
                     if (gt.NumActVar > label.NumActVar &&
                         (block.HasUpValue || ActiveLabels.Count > block.FirstLabel)) {
-                        Coder.PatchClose(CurFunc, gt.Pc, label.NumActVar);
+                        LuaCoder.PatchClose(CurFunc, gt.Pc, label.NumActVar);
                     }
                     CloseGoto(g, label);
                     return true;
@@ -478,7 +476,7 @@ namespace CsharpLua
                 var gt = PendingGotos[i];
                 if (gt.NumActVar > block.NumActVar) {
                     if (block.HasUpValue)
-                        Coder.PatchClose(fs, gt.Pc, block.NumActVar);
+                        LuaCoder.PatchClose(fs, gt.Pc, block.NumActVar);
                     gt.NumActVar = block.NumActVar;
                 }
                 if (!FindLabel(i))
@@ -522,9 +520,9 @@ namespace CsharpLua
             var block = fs.Block;
 
             if (block.Previous != null && block.HasUpValue) {
-                int j = Coder.Jump(fs);
-                Coder.PatchClose(fs, j, block.NumActVar);
-                Coder.PatchToHere(fs, j);
+                int j = LuaCoder.Jump(fs);
+                LuaCoder.PatchClose(fs, j, block.NumActVar);
+                LuaCoder.PatchToHere(fs, j);
             }
 
             if (block.IsLoop)
@@ -651,10 +649,10 @@ namespace CsharpLua
         {
             FuncState fs = CurFunc;
             ExpDesc key = new ExpDesc();
-            Coder.Exp2AnyRegUp(fs, v);
+            LuaCoder.Exp2AnyRegUp(fs, v);
             Lexer.Next(); // skip the dot or colon
             CodeString(key, CheckName());
-            Coder.Indexed(fs, v, key);
+            LuaCoder.Indexed(fs, v, key);
         }
 
         // cond -> exp
@@ -667,7 +665,7 @@ namespace CsharpLua
             if (v.Kind == ExpKind.VNIL)
                 v.Kind = ExpKind.VFALSE;
 
-            Coder.GoIfTrue(CurFunc, v);
+            LuaCoder.GoIfTrue(CurFunc, v);
             return v.ExitFalse;
         }
 
@@ -731,22 +729,22 @@ namespace CsharpLua
             var block = new BlockCnt();
 
             Lexer.Next(); // skip WHILE
-            int whileInit = Coder.GetLabel(fs);
+            int whileInit = LuaCoder.GetLabel(fs);
             int condExit = Cond();
             EnterBlock(fs, block, true);
             CheckNext((int)TK.DO);
             Block();
-            Coder.JumpTo(fs, whileInit);
+            LuaCoder.JumpTo(fs, whileInit);
             CheckMatch((int)TK.END, (int)TK.WHILE, line);
             LeaveBlock(fs);
-            Coder.PatchToHere(fs, condExit);
+            LuaCoder.PatchToHere(fs, condExit);
         }
 
         // repeatstat -> REPEAT block UNTIL cond
         private void RepeatStat(int line)
         {
             var fs = CurFunc;
-            int repeatInit = Coder.GetLabel(fs);
+            int repeatInit = LuaCoder.GetLabel(fs);
             var blockLoop = new BlockCnt();
             var blockScope = new BlockCnt();
             EnterBlock(fs, blockLoop, true);
@@ -756,10 +754,10 @@ namespace CsharpLua
             CheckMatch((int)TK.UNTIL, (int)TK.REPEAT, line);
             int condExit = Cond();
             if (blockScope.HasUpValue) {
-                Coder.PatchClose(fs, condExit, blockScope.NumActVar);
+                LuaCoder.PatchClose(fs, condExit, blockScope.NumActVar);
             }
             LeaveBlock(fs);
-            Coder.PatchList(fs, condExit, repeatInit); // close the loop
+            LuaCoder.PatchList(fs, condExit, repeatInit); // close the loop
             LeaveBlock(fs);
         }
 
@@ -767,7 +765,7 @@ namespace CsharpLua
         {
             var e = new ExpDesc();
             Expr(e);
-            Coder.Exp2NextReg(CurFunc, e);
+            LuaCoder.Exp2NextReg(CurFunc, e);
             LuaUtil.Assert(e.Kind == ExpKind.VNONRELOC);
             return e.Info;
         }
@@ -779,27 +777,27 @@ namespace CsharpLua
             var block = new BlockCnt();
             AdjustLocalVars(3); // control variables
             CheckNext((int)TK.DO);
-            int prep = isnum ? Coder.CodeAsBx(fs, OpCode.OP_FORPREP, t, Coder.NO_JUMP)
-                : Coder.Jump(fs);
+            int prep = isnum ? LuaCoder.CodeAsBx(fs, OpCode.OP_FORPREP, t, LuaCoder.NO_JUMP)
+                : LuaCoder.Jump(fs);
             EnterBlock(fs, block, false);
             AdjustLocalVars(nvars);
-            Coder.ReserveRegs(fs, nvars);
+            LuaCoder.ReserveRegs(fs, nvars);
             Block();
             LeaveBlock(fs);
-            Coder.PatchToHere(fs, prep);
+            LuaCoder.PatchToHere(fs, prep);
 
             int endfor;
             if (isnum) // numeric for?
             {
-                endfor = Coder.CodeAsBx(fs, OpCode.OP_FORLOOP, t, Coder.NO_JUMP);
+                endfor = LuaCoder.CodeAsBx(fs, OpCode.OP_FORLOOP, t, LuaCoder.NO_JUMP);
             } else // generic for
               {
-                Coder.CodeABC(fs, OpCode.OP_TFORCALL, t, 0, nvars);
-                Coder.FixLine(fs, line);
-                endfor = Coder.CodeAsBx(fs, OpCode.OP_TFORLOOP, t + 2, Coder.NO_JUMP);
+                LuaCoder.CodeABC(fs, OpCode.OP_TFORCALL, t, 0, nvars);
+                LuaCoder.FixLine(fs, line);
+                endfor = LuaCoder.CodeAsBx(fs, OpCode.OP_TFORLOOP, t + 2, LuaCoder.NO_JUMP);
             }
-            Coder.PatchList(fs, endfor, prep + 1);
-            Coder.FixLine(fs, line);
+            LuaCoder.PatchList(fs, endfor, prep + 1);
+            LuaCoder.FixLine(fs, line);
         }
 
         // fornum -> NAME = exp1,expe1[,exp1] forbody
@@ -819,8 +817,8 @@ namespace CsharpLua
                 Exp1(); // optional step
             } else // default step = 1
               {
-                Coder.CodeK(fs, fs.FreeReg, Coder.NumberK(fs, 1));
-                Coder.ReserveRegs(fs, 1);
+                LuaCoder.CodeK(fs, fs.FreeReg, LuaCoder.NumberK(fs, 1));
+                LuaCoder.ReserveRegs(fs, 1);
             }
             ForBody(save, line, 1, true);
         }
@@ -847,7 +845,7 @@ namespace CsharpLua
             CheckNext((int)TK.IN);
             int line = Lexer.LineNumber;
             AdjustAssign(3, ExpList(e), e);
-            Coder.CheckStack(fs, 3); // extra space to call generator
+            LuaCoder.CheckStack(fs, 3); // extra space to call generator
             ForBody(save, line, nvars - 3, false);
         }
 
@@ -886,7 +884,7 @@ namespace CsharpLua
             if (Lexer.Token.TokenType == (int)TK.GOTO ||
                 Lexer.Token.TokenType == (int)TK.BREAK) {
                 // will jump to label if condition is true
-                Coder.GoIfFalse(CurFunc, v);
+                LuaCoder.GoIfFalse(CurFunc, v);
 
                 // must enter block before `goto'
                 EnterBlock(fs, block, false);
@@ -902,13 +900,13 @@ namespace CsharpLua
                     LeaveBlock(fs);
                     return escapeList;
                 } else {
-                    jf = Coder.Jump(fs);
+                    jf = LuaCoder.Jump(fs);
                 }
             }
             // regular case (not goto/break)
             else {
                 // skip over block if condition is false
-                Coder.GoIfTrue(CurFunc, v);
+                LuaCoder.GoIfTrue(CurFunc, v);
                 EnterBlock(fs, block, false);
                 jf = v.ExitFalse;
             }
@@ -921,9 +919,9 @@ namespace CsharpLua
             if (Lexer.Token.TokenType == (int)TK.ELSE ||
                 Lexer.Token.TokenType == (int)TK.ELSEIF) {
                 // must jump over it
-                escapeList = Coder.Concat(fs, escapeList, Coder.Jump(fs));
+                escapeList = LuaCoder.Concat(fs, escapeList, LuaCoder.Jump(fs));
             }
-            Coder.PatchToHere(fs, jf);
+            LuaCoder.PatchToHere(fs, jf);
             return escapeList;
         }
 
@@ -933,7 +931,7 @@ namespace CsharpLua
             var fs = CurFunc;
 
             // exit list for finished parts
-            int escapeList = Coder.NO_JUMP;
+            int escapeList = LuaCoder.NO_JUMP;
 
             // IF cond THEN block
             escapeList = TestThenBlock(escapeList);
@@ -947,7 +945,7 @@ namespace CsharpLua
                 Block();
 
             CheckMatch((int)TK.END, (int)TK.IF, line);
-            Coder.PatchToHere(fs, escapeList);
+            LuaCoder.PatchToHere(fs, escapeList);
         }
 
         private void LocalFunc()
@@ -1006,8 +1004,8 @@ namespace CsharpLua
             Lexer.Next();
             bool isMethod = FuncName(v);
             Body(b, isMethod, line);
-            Coder.StoreVar(CurFunc, v, b);
-            Coder.FixLine(CurFunc, line);
+            LuaCoder.StoreVar(CurFunc, v, b);
+            LuaCoder.FixLine(CurFunc, line);
         }
 
         // stat -> func | assignment
@@ -1044,7 +1042,7 @@ namespace CsharpLua
                 var e = new ExpDesc();
                 nret = ExpList(e);
                 if (HasMultiRet(e.Kind)) {
-                    Coder.SetMultiRet(fs, e);
+                    LuaCoder.SetMultiRet(fs, e);
                     if (e.Kind == ExpKind.VCALL && nret == 1) // tail call?
                     {
                         var pi = fs.GetCode(e);
@@ -1056,15 +1054,15 @@ namespace CsharpLua
                 } else {
                     if (nret == 1) // only one single value
                     {
-                        first = Coder.Exp2AnyReg(fs, e);
+                        first = LuaCoder.Exp2AnyReg(fs, e);
                     } else {
-                        Coder.Exp2NextReg(fs, e); // values must go to the `stack'
+                        LuaCoder.Exp2NextReg(fs, e); // values must go to the `stack'
                         first = fs.NumActVar;
                         LuaUtil.Assert(nret == fs.FreeReg - first);
                     }
                 }
             }
-            Coder.Ret(fs, first, nret);
+            LuaCoder.Ret(fs, first, nret);
             TestNext((int)';'); // skip optional semicolon
         }
 
@@ -1147,7 +1145,7 @@ namespace CsharpLua
                 // stat -> 'goto' NAME
                 case (int)TK.BREAK:
                 case (int)TK.GOTO: {
-                        GotoStat(Coder.Jump(CurFunc));
+                        GotoStat(LuaCoder.Jump(CurFunc));
                         break;
                     }
 
@@ -1230,7 +1228,7 @@ namespace CsharpLua
                 LuaUtil.Assert(e.Kind == ExpKind.VLOCAL ||
                             e.Kind == ExpKind.VUPVAL);
                 CodeString(key, name);
-                Coder.Indexed(CurFunc, e, key);
+                LuaCoder.Indexed(CurFunc, e, key);
             }
         }
 
@@ -1243,16 +1241,16 @@ namespace CsharpLua
                 ++extra;
                 if (extra < 0)
                     extra = 0;
-                Coder.SetReturns(fs, e, extra);
+                LuaCoder.SetReturns(fs, e, extra);
                 if (extra > 1)
-                    Coder.ReserveRegs(fs, extra - 1);
+                    LuaCoder.ReserveRegs(fs, extra - 1);
             } else {
                 if (e.Kind != ExpKind.VVOID)
-                    Coder.Exp2NextReg(fs, e); // close last expression
+                    LuaCoder.Exp2NextReg(fs, e); // close last expression
                 if (extra > 0) {
                     int reg = fs.FreeReg;
-                    Coder.ReserveRegs(fs, extra);
-                    Coder.CodeNil(fs, reg, extra);
+                    LuaCoder.ReserveRegs(fs, extra);
+                    LuaCoder.CodeNil(fs, reg, extra);
                 }
             }
         }
@@ -1290,8 +1288,8 @@ namespace CsharpLua
             if (conflict) {
                 // copy upvalue/local value to a temporary (in position 'extra')
                 var op = (v.Kind == ExpKind.VLOCAL) ? OpCode.OP_MOVE : OpCode.OP_GETUPVAL;
-                Coder.CodeABC(fs, op, extra, v.Info, 0);
-                Coder.ReserveRegs(fs, 1);
+                LuaCoder.CodeABC(fs, op, extra, v.Info, 0);
+                LuaCoder.ReserveRegs(fs, 1);
             }
         }
 
@@ -1321,15 +1319,15 @@ namespace CsharpLua
                         CurFunc.FreeReg -= (nexps - nvars);
                     }
                 } else {
-                    Coder.SetOneRet(CurFunc, e);
-                    Coder.StoreVar(CurFunc, lh.Exp, e);
+                    LuaCoder.SetOneRet(CurFunc, e);
+                    LuaCoder.StoreVar(CurFunc, lh.Exp, e);
                     return;
                 }
             }
 
             // default assignment
             InitExp(e, ExpKind.VNONRELOC, CurFunc.FreeReg - 1);
-            Coder.StoreVar(CurFunc, lh.Exp, e);
+            LuaCoder.StoreVar(CurFunc, lh.Exp, e);
         }
 
         private int ExpList(ExpDesc e)
@@ -1337,7 +1335,7 @@ namespace CsharpLua
             int n = 1; // at least one expression
             Expr(e);
             while (TestNext((int)',')) {
-                Coder.Exp2NextReg(CurFunc, e);
+                LuaCoder.Exp2NextReg(CurFunc, e);
                 Expr(e);
                 n++;
             }
@@ -1358,7 +1356,7 @@ namespace CsharpLua
                 int line = Lexer.LineNumber;
                 Lexer.Next();
                 SubExpr(e, UnaryPrior);
-                Coder.Prefix(CurFunc, uop, e, line);
+                LuaCoder.Prefix(CurFunc, uop, e, line);
             } else SimpleExp(e);
 
             // expand while operators have priorities higher than `limit'
@@ -1367,12 +1365,12 @@ namespace CsharpLua
                 // ULDebug.Log("op:" + op);
                 int line = Lexer.LineNumber;
                 Lexer.Next();
-                Coder.Infix(CurFunc, op, e);
+                LuaCoder.Infix(CurFunc, op, e);
 
                 // read sub-expression with higher priority
                 ExpDesc e2 = new ExpDesc();
                 BinOpr nextOp = SubExpr(e2, GetBinOprRightPrior(op));
-                Coder.Posfix(CurFunc, op, e, e2, line);
+                LuaCoder.Posfix(CurFunc, op, e, e2, line);
                 op = nextOp;
             }
 
@@ -1420,7 +1418,7 @@ namespace CsharpLua
         {
             Lexer.Next();
             Expr(v);
-            Coder.Exp2Val(CurFunc, v);
+            LuaCoder.Exp2Val(CurFunc, v);
             CheckNext((int)']');
         }
 
@@ -1442,10 +1440,10 @@ namespace CsharpLua
             }
             cc.NumRecord++;
             CheckNext((int)'=');
-            int rkkey = Coder.Exp2RK(fs, key);
+            int rkkey = LuaCoder.Exp2RK(fs, key);
             Expr(val);
-            Coder.CodeABC(fs, OpCode.OP_SETTABLE, cc.ExpTable.Info, rkkey,
-                Coder.Exp2RK(fs, val));
+            LuaCoder.CodeABC(fs, OpCode.OP_SETTABLE, cc.ExpTable.Info, rkkey,
+                LuaCoder.Exp2RK(fs, val));
             fs.FreeReg = reg; // free registers
         }
 
@@ -1455,11 +1453,11 @@ namespace CsharpLua
             if (cc.ExpLastItem.Kind == ExpKind.VVOID)
                 return;
 
-            Coder.Exp2NextReg(fs, cc.ExpLastItem);
+            LuaCoder.Exp2NextReg(fs, cc.ExpLastItem);
             cc.ExpLastItem.Kind = ExpKind.VVOID;
             if (cc.NumToStore == LuaDef.LFIELDS_PER_FLUSH) {
                 // flush
-                Coder.SetList(fs, cc.ExpTable.Info, cc.NumArray, cc.NumToStore);
+                LuaCoder.SetList(fs, cc.ExpTable.Info, cc.NumArray, cc.NumToStore);
 
                 // no more item pending
                 cc.NumToStore = 0;
@@ -1472,15 +1470,15 @@ namespace CsharpLua
                 return;
 
             if (HasMultiRet(cc.ExpLastItem.Kind)) {
-                Coder.SetMultiRet(fs, cc.ExpLastItem);
-                Coder.SetList(fs, cc.ExpTable.Info, cc.NumArray, LuaDef.LUA_MULTRET);
+                LuaCoder.SetMultiRet(fs, cc.ExpLastItem);
+                LuaCoder.SetList(fs, cc.ExpTable.Info, cc.NumArray, LuaDef.LUA_MULTRET);
 
                 // do not count last expression (unknown number of elements)
                 cc.NumArray--;
             } else {
                 if (cc.ExpLastItem.Kind != ExpKind.VVOID)
-                    Coder.Exp2NextReg(fs, cc.ExpLastItem);
-                Coder.SetList(fs, cc.ExpTable.Info, cc.NumArray, cc.NumToStore);
+                    LuaCoder.Exp2NextReg(fs, cc.ExpLastItem);
+                LuaCoder.SetList(fs, cc.ExpTable.Info, cc.NumArray, cc.NumToStore);
             }
         }
 
@@ -1541,12 +1539,12 @@ namespace CsharpLua
         {
             var fs = CurFunc;
             int line = Lexer.LineNumber;
-            int pc = Coder.CodeABC(fs, OpCode.OP_NEWTABLE, 0, 0, 0);
+            int pc = LuaCoder.CodeABC(fs, OpCode.OP_NEWTABLE, 0, 0, 0);
             var cc = new ConstructorControl();
             cc.ExpTable = t;
             InitExp(t, ExpKind.VRELOCABLE, pc);
             InitExp(cc.ExpLastItem, ExpKind.VVOID, 0); // no value (yet)
-            Coder.Exp2NextReg(fs, t);
+            LuaCoder.Exp2NextReg(fs, t);
             CheckNext((int)'{');
             do {
                 LuaUtil.Assert(cc.ExpLastItem.Kind == ExpKind.VVOID ||
@@ -1605,7 +1603,7 @@ namespace CsharpLua
             }
             AdjustLocalVars(numParams);
             CurFunc.Proto.NumParams = CurFunc.NumActVar;
-            Coder.ReserveRegs(CurFunc, CurFunc.NumActVar);
+            LuaCoder.ReserveRegs(CurFunc, CurFunc.NumActVar);
         }
 
         private void Body(ExpDesc e, bool isMethod, int line)
@@ -1642,7 +1640,7 @@ namespace CsharpLua
                             args.Kind = ExpKind.VVOID;
                         else {
                             ExpList(args);
-                            Coder.SetMultiRet(CurFunc, args);
+                            LuaCoder.SetMultiRet(CurFunc, args);
                         }
                         CheckMatch((int)')', (int)'(', line);
                         break;
@@ -1675,12 +1673,12 @@ namespace CsharpLua
                 nparams = LuaDef.LUA_MULTRET;
             else {
                 if (args.Kind != ExpKind.VVOID)
-                    Coder.Exp2NextReg(CurFunc, args); // close last argument
+                    LuaCoder.Exp2NextReg(CurFunc, args); // close last argument
                 nparams = CurFunc.FreeReg - (baseReg + 1);
             }
-            InitExp(e, ExpKind.VCALL, Coder.CodeABC(CurFunc,
+            InitExp(e, ExpKind.VCALL, LuaCoder.CodeABC(CurFunc,
                 OpCode.OP_CALL, baseReg, nparams + 1, 2));
-            Coder.FixLine(CurFunc, line);
+            LuaCoder.FixLine(CurFunc, line);
 
             // call remove function and arguments and leaves
             // (unless changed) one result
@@ -1700,7 +1698,7 @@ namespace CsharpLua
                         Lexer.Next();
                         Expr(e);
                         CheckMatch((int)')', (int)'(', line);
-                        Coder.DischargeVars(CurFunc, e);
+                        LuaCoder.DischargeVars(CurFunc, e);
                         return;
                     }
 
@@ -1730,23 +1728,23 @@ namespace CsharpLua
                         }
                     case (int)'[': { // `[' exp1 `]'
                             var key = new ExpDesc();
-                            Coder.Exp2AnyRegUp(fs, e);
+                            LuaCoder.Exp2AnyRegUp(fs, e);
                             YIndex(key);
-                            Coder.Indexed(fs, e, key);
+                            LuaCoder.Indexed(fs, e, key);
                             break;
                         }
                     case (int)':': { // `:' NAME funcargs
                             var key = new ExpDesc();
                             Lexer.Next();
                             CodeString(key, CheckName());
-                            Coder.Self(fs, e, key);
+                            LuaCoder.Self(fs, e, key);
                             FuncArgs(e, line);
                             break;
                         }
                     case (int)'(':
                     case (int)TK.STRING:
                     case (int)'{': { // funcargs
-                            Coder.Exp2NextReg(CurFunc, e);
+                            LuaCoder.Exp2NextReg(CurFunc, e);
                             FuncArgs(e, line);
                             break;
                         }
@@ -1791,7 +1789,7 @@ namespace CsharpLua
                         CheckCondition(CurFunc.Proto.IsVarArg,
                             "cannot use '...' outside a vararg function");
                         InitExp(e, ExpKind.VVARARG,
-                            Coder.CodeABC(CurFunc, OpCode.OP_VARARG, 0, 1, 0));
+                            LuaCoder.CodeABC(CurFunc, OpCode.OP_VARARG, 0, 1, 0));
                         break;
                     }
 
@@ -1838,15 +1836,15 @@ namespace CsharpLua
 
         private void CodeString(ExpDesc e, string s)
         {
-            InitExp(e, ExpKind.VK, Coder.StringK(CurFunc, s));
+            InitExp(e, ExpKind.VK, LuaCoder.StringK(CurFunc, s));
         }
 
         private void InitExp(ExpDesc e, ExpKind k, int i)
         {
             e.Kind = k;
             e.Info = i;
-            e.ExitTrue = Coder.NO_JUMP;
-            e.ExitFalse = Coder.NO_JUMP;
+            e.ExitTrue = LuaCoder.NO_JUMP;
+            e.ExitFalse = LuaCoder.NO_JUMP;
         }
     }
 

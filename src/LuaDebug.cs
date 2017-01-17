@@ -378,7 +378,7 @@ namespace CsharpLua
 
 					default: {
 						// any instruction that set A
-						if( Coder.TestAMode( op ) && reg == a ) {
+						if( LuaCoder.TestAMode( op ) && reg == a ) {
 							setreg = pc;
 						}
 						break;
