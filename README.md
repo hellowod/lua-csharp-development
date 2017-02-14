@@ -5,4 +5,4 @@ c# lua5.2.1 achieve base unilua
 
 open project vis vs-2015
 
-application target framewor is .NET Framework 4.5
+application target framework is .NET Framework 4.5

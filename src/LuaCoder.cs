@@ -290,8 +290,7 @@ namespace CsharpLua
             fs.Proto.LineInfo[fs.Pc - 1] = line;
         }
 
-        private static void CodeArith(FuncState fs, OpCode op,
-            ExpDesc e1, ExpDesc e2, int line)
+        private static void CodeArith(FuncState fs, OpCode op, ExpDesc e1, ExpDesc e2, int line)
         {
             if (ConstFolding(op, e1, e2))
                 return;

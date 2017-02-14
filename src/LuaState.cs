@@ -5,6 +5,11 @@
 
 using System.Collections.Generic;
 
+/***
+ * LuaState.cs
+ * 
+ * lua状态机，这是lua设计的核心数据结构，lua堆栈结构都是定义在这个文里面里面
+ */ 
 namespace CsharpLua
 {
 	using InstructionPtr = Pointer<Instruction>;

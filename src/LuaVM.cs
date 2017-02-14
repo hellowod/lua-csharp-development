@@ -16,6 +16,12 @@
 using System;
 using System.Collections.Generic;
 
+/***
+ * LuaVM.cs
+ * 
+ * lua虚拟机，关键函数是执行lua指令，函数如口：V_Execute
+ * 
+ */
 namespace CsharpLua
 {
     using ULDebug = Tools.CLDebug;
