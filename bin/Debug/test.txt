@@ -1,0 +1,7 @@
+
+main <test.lua:0,0> (4 instructions at 006184F8)
+0+ params, 2 slots, 1 upvalue, 0 locals, 2 constants, 0 functions
+	1	[1]	GETTABUP 	0 0 -1	; _ENV "print"
+	2	[1]	LOADK    	1 -2	; "hello"
+	3	[1]	CALL     	0 2 1
+	4	[1]	RETURN   	0 1
