@@ -136,6 +136,7 @@ namespace CsharpLua
 
 	public delegate void LuaHookDelegate(ILuaState lua, LuaDebug ar);
 
+    // lua状态机（lua运行核心）
 	public partial class LuaState
 	{
 		public StkId[]			Stack;

@@ -502,6 +502,9 @@ namespace CsharpLua
             return API.ToString(-1);
         }
 
+        /// <summary>
+        /// 加载lua标准库
+        /// </summary>
         public void L_OpenLibs()
         {
             NameFuncPair[] define = new NameFuncPair[]
