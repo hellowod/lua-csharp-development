@@ -553,7 +553,7 @@ namespace CsharpLua
             else {
                 API.Pop(1);
                 index = API.AbsIndex(index);
-                API.NewTable();
+                API.CreateTable();
                 API.PushValue(-1);
                 API.SetField(index, fname);
                 return 0;

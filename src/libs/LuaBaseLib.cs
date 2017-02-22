@@ -1,15 +1,13 @@
-﻿
+﻿using ULDebug = CsharpLua.Tools.CLDebug;
+using StringBuilder = System.Text.StringBuilder;
+using Char = System.Char;
+using Int32 = System.Int32;
+
 namespace CsharpLua
 {
-	using System.Collections.Generic;
-	using ULDebug = CsharpLua.Tools.CLDebug;
-	using StringBuilder = System.Text.StringBuilder;
-	using Char = System.Char;
-	using Int32 = System.Int32;
-
 	internal static class LuaBaseLib
 	{
-		internal static int OpenLib( ILuaState lua )
+		public static int OpenLib( ILuaState lua )
 		{
 			NameFuncPair[] define = new NameFuncPair[]
 			{
@@ -183,6 +181,7 @@ namespace CsharpLua
 			ThreadStatus status = lua.GetContext( out context );
 			return FinishPCall( lua, status == ThreadStatus.LUA_YIELD );
 		}
+
 		private static CSharpFunctionDelegate DG_PCallContinuation = PCallContinuation;
 
 		public static int B_PCall( ILuaState lua )
@@ -349,8 +348,7 @@ namespace CsharpLua
 			return 1;
 		}
 
-		private static int PairsMeta( ILuaState lua, string method, bool isZero
-			, CSharpFunctionDelegate iter )
+		private static int PairsMeta( ILuaState lua, string method, bool isZero, CSharpFunctionDelegate iter )
 		{
 			if( !lua.L_GetMetaField( 1, method ) ) // no metamethod?
 			{
@@ -383,7 +381,7 @@ namespace CsharpLua
 				return 1;
 			}
 		}
-		static CSharpFunctionDelegate DG_B_Next = B_Next;
+		private static CSharpFunctionDelegate DG_B_Next = B_Next;
 
 		public static int B_Pairs( ILuaState lua )
 		{
@@ -435,6 +433,5 @@ namespace CsharpLua
 		}
 
 	}
-
 }
 

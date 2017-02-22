@@ -46,13 +46,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\api\ILuaAPI.cs" />
     <Compile Include="src\LuaByteString.cs" />
     <Compile Include="src\LuaCoder.cs" />
     <Compile Include="src\LuaConf.cs" />
     <Compile Include="src\LuaDo.cs" />
     <Compile Include="src\LuaDump.cs" />
     <Compile Include="src\LuaLex.cs" />
-    <Compile Include="src\LuaAPI.cs" />
+    <Compile Include="src\api\LuaAPI.cs" />
     <Compile Include="src\libs\LuaAuxLib.cs" />
     <Compile Include="src\libs\LuaBaseLib.cs" />
     <Compile Include="src\libs\LuaBitLib.cs" />

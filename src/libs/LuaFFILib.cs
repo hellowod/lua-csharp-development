@@ -86,7 +86,7 @@ namespace CsharpLua
 				lua.PushNil();
 			lua.PushString( result.FuncName );
 			if( result.ParameterTypes != null ) {
-				lua.NewTable();
+				lua.CreateTable();
 				for( int i=0; i<result.ParameterTypes.Length; ++i ) {
 					lua.PushString( result.ParameterTypes[i] );
 					lua.RawSetI( -2, i+1 );
