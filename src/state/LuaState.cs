@@ -13,7 +13,7 @@ using System.Collections.Generic;
 namespace CsharpLua
 {
 	using InstructionPtr = Pointer<Instruction>;
-	using ULDebug = CsharpLua.Tools.CLDebug;
+	using ULDebug = CsharpLua.Tools.CsLDebug;
 
 	public struct Pointer<T>
 	{
@@ -305,7 +305,6 @@ namespace CsharpLua
 		{
 			HookCount = BaseHookCount;
 		}
-
 	}
 
 }

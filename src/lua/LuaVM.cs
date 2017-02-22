@@ -24,7 +24,7 @@ using System.Collections.Generic;
  */
 namespace CsharpLua
 {
-    using ULDebug = Tools.CLDebug;
+    using ULDebug = Tools.CsLDebug;
     using StringBuilder = System.Text.StringBuilder;
 
     public partial class LuaState

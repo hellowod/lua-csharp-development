@@ -47,45 +47,46 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\api\ILuaAPI.cs" />
-    <Compile Include="src\LuaByteString.cs" />
-    <Compile Include="src\LuaCoder.cs" />
-    <Compile Include="src\LuaConf.cs" />
-    <Compile Include="src\LuaDo.cs" />
-    <Compile Include="src\LuaDump.cs" />
-    <Compile Include="src\LuaLex.cs" />
+    <Compile Include="src\lua\LuaByteString.cs" />
+    <Compile Include="src\luac\LuaCoder.cs" />
+    <Compile Include="src\object\LuaConf.cs" />
+    <Compile Include="src\state\LuaDo.cs" />
+    <Compile Include="src\dump\LuaDump.cs" />
+    <Compile Include="src\luac\LuaLex.cs" />
     <Compile Include="src\api\LuaAPI.cs" />
     <Compile Include="src\libs\LuaAuxLib.cs" />
     <Compile Include="src\libs\LuaBaseLib.cs" />
     <Compile Include="src\libs\LuaBitLib.cs" />
     <Compile Include="src\libs\LuaCoroLib.cs" />
-    <Compile Include="src\LuaDebug.cs" />
+    <Compile Include="src\debug\LuaDebug.cs" />
     <Compile Include="src\libs\LuaDebugLib.cs" />
     <Compile Include="src\libs\LuaEncLib.cs" />
     <Compile Include="src\libs\LuaFFILib.cs" />
-    <Compile Include="src\LuaFile.cs" />
-    <Compile Include="src\LuaFunc.cs" />
+    <Compile Include="src\lua\LuaFile.cs" />
+    <Compile Include="src\state\LuaFunc.cs" />
     <Compile Include="src\libs\LuaIOLib.cs" />
     <Compile Include="src\libs\LuaMathLib.cs" />
-    <Compile Include="src\LuaObject.cs" />
+    <Compile Include="src\object\LuaObject.cs" />
     <Compile Include="src\libs\LuaOsLib.cs" />
     <Compile Include="src\libs\LuaPkgLib.cs" />
-    <Compile Include="src\LuaState.cs" />
+    <Compile Include="src\state\LuaState.cs" />
     <Compile Include="src\libs\LuaStrLib.cs" />
-    <Compile Include="src\LuaTable.cs" />
+    <Compile Include="src\object\LuaTable.cs" />
     <Compile Include="src\libs\LuaTableLib.cs" />
-    <Compile Include="src\LuaOpCodes.cs" />
-    <Compile Include="src\LuaParser.cs" />
-    <Compile Include="Lua.cs" />
+    <Compile Include="src\object\LuaOpCodes.cs" />
+    <Compile Include="src\luac\LuaParser.cs" />
+    <Compile Include="src\Lua.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="src\LuaTM.cs" />
-    <Compile Include="src\CLDebug.cs" />
-    <Compile Include="src\LuaUndump.cs" />
-    <Compile Include="src\LuaUtil.cs" />
-    <Compile Include="src\LuaVM.cs" />
+    <Compile Include="src\lua\LuaTM.cs" />
+    <Compile Include="src\debug\CsLDebug.cs" />
+    <Compile Include="src\dump\LuaUndump.cs" />
+    <Compile Include="src\lua\LuaUtil.cs" />
+    <Compile Include="src\lua\LuaVM.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

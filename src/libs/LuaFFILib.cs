@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace CsharpLua
 {
-	using ULDebug = CsharpLua.Tools.CLDebug;
+	using ULDebug = CsharpLua.Tools.CsLDebug;
 
 	internal class LuaFFILib
 	{

@@ -2,14 +2,14 @@
 
 namespace CsharpLua.Tools
 {
-	public class CLDebug
+	public class CsLDebug
 	{
 		public static Action<object> Log = NoAction;
 		public static Action<object> LogError = NoAction;
 
 		private static void NoAction(object msg) { }
 
-		static CLDebug()
+		static CsLDebug()
 		{
             Log = LogMessage;
             LogError = ErrorMessage;

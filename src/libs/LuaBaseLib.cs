@@ -1,4 +1,4 @@
-﻿using ULDebug = CsharpLua.Tools.CLDebug;
+﻿using ULDebug = CsharpLua.Tools.CsLDebug;
 using StringBuilder = System.Text.StringBuilder;
 using Char = System.Char;
 using Int32 = System.Int32;

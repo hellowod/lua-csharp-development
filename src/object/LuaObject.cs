@@ -5,7 +5,7 @@ namespace CsharpLua
 {
     using System;
     using System.Collections.Generic;
-    using ULDebug = CsharpLua.Tools.CLDebug;
+    using ULDebug = CsharpLua.Tools.CsLDebug;
 
     public struct TValue
     {

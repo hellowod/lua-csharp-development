@@ -4,8 +4,6 @@
 
 using System;
 
-using ULDebug = CsharpLua.Tools.CLDebug;
-
 namespace CsharpLua
 {
     public class BinaryBytesReader
@@ -36,7 +34,7 @@ namespace CsharpLua
 			{
 				sb.Append( string.Format(" {0:X02}", ret[i]) );
 			}
-			ULDebug.Log( sb.ToString() );
+			CsLDebug.Log( sb.ToString() );
 #endif
             return ret;
         }
@@ -46,7 +44,7 @@ namespace CsharpLua
             var bytes = ReadBytes(4);
             int ret = BitConverter.ToInt32(bytes, 0);
 #if DEBUG_BINARY_READER
-			ULDebug.Log( "ReadInt: " + ret );
+			CsLDebug.Log( "ReadInt: " + ret );
 #endif
             return ret;
         }
@@ -56,7 +54,7 @@ namespace CsharpLua
             var bytes = ReadBytes(4);
             uint ret = BitConverter.ToUInt32(bytes, 0);
 #if DEBUG_BINARY_READER
-			ULDebug.Log( "ReadUInt: " + ret );
+			CsLDebug.Log( "ReadUInt: " + ret );
 #endif
             return ret;
         }

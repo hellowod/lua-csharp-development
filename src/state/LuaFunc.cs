@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 
-using ULDebug = CsharpLua.Tools.CLDebug;
+using ULDebug = CsharpLua.Tools.CsLDebug;
 
 namespace CsharpLua
 {
