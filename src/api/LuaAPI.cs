@@ -678,14 +678,14 @@ namespace CsharpLua
         bool ILuaAPI.Next(int index)
         {
             StkId addr;
-            if (!Index2Addr(index, out addr))
-                throw new System.Exception("table expected");
-
-            var tbl = addr.V.HValue();
-            if (tbl == null)
-                throw new System.Exception("table expected");
-
-            var key = Stack[Top.Index - 1];
+            if (!Index2Addr(index, out addr)) {
+                throw new Exception("table expected");
+            }
+            LuaTable tbl = addr.V.HValue();
+            if (tbl == null) {
+                throw new Exception("table expected");
+            }
+            StkId key = Stack[Top.Index - 1];
             if (tbl.Next(key, Top)) {
                 ApiIncrTop();
                 return true;
@@ -698,10 +698,10 @@ namespace CsharpLua
         void ILuaAPI.RawGetI(int index, int n)
         {
             StkId addr;
-            if (!Index2Addr(index, out addr))
+            if (!Index2Addr(index, out addr)) {
                 LuaUtil.ApiCheck(false, "table expected");
-
-            var tbl = addr.V.HValue();
+            }
+            LuaTable tbl = addr.V.HValue();
             LuaUtil.ApiCheck(tbl != null, "table expected");
 
             Top.V.SetObj(ref tbl.GetInt(n).V);
