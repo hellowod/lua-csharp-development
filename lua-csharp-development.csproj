@@ -7,8 +7,8 @@
     <ProjectGuid>{1EC53DCA-76DE-435F-AE3A-6DFD3D0D5FED}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>csharp-lua</RootNamespace>
-    <AssemblyName>csharp-lua</AssemblyName>
+    <RootNamespace>lua-csharp</RootNamespace>
+    <AssemblyName>lua-csharp</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
