@@ -77,6 +77,7 @@ namespace CsharpLua
             return status;
         }
 
+        // 调用函数
         private void D_Call(StkId func, int nResults, bool allowYield)
         {
             if (++NumCSharpCalls >= LuaLimits.LUAI_MAXCCALLS) {
@@ -96,42 +97,33 @@ namespace CsharpLua
             if (!allowYield) {
                 NumNonYieldable--;
             }
-                
             NumCSharpCalls--;
         }
 
-        /// <summary>
-        /// return true if function has been executed
-        /// </summary>
+        // 调用函数前
         private bool D_PreCall(StkId func, int nResults)
         {
-            // prepare for Lua call
-
-#if DEBUG_D_PRE_CALL
-			ULDebug.Log( "============================ D_PreCall func:" + func );
-#endif
-
             int funcIndex = func.Index;
             if (!func.V.TtIsFunction()) {
                 // not a function
                 // retry with `function' tag method
-                func = tryFuncTM(func);
-
+                func = TryFuncTM(func);
                 // now it must be a function
                 return D_PreCall(func, nResults);
             }
-
             if (func.V.ClIsLuaClosure()) {
-                var cl = func.V.ClLValue();
+                LuaLClosureValue cl = func.V.ClLValue();
                 LuaUtil.Assert(cl != null);
-                var p = cl.Proto;
+                LuaProto p = cl.Proto;
 
                 D_CheckStack(p.MaxStackSize + p.NumParams);
                 func = Stack[funcIndex];
 
                 // 补全参数
                 int n = (Top.Index - func.Index) - 1;
-                for (; n < p.NumParams; ++n) { StkId.inc(ref Top).V.SetNilValue(); }
+                for (; n < p.NumParams; ++n) {
+                    StkId.inc(ref Top).V.SetNilValue();
+                }
 
                 int stackBase = (!p.IsVarArg) ? (func.Index + 1) : AdjustVarargs(p, n);
 
@@ -150,7 +142,7 @@ namespace CsharpLua
             }
 
             if (func.V.ClIsCsClosure()) {
-                var cscl = func.V.ClCsValue();
+                LuaCsClosureValue cscl = func.V.ClCsValue();
                 LuaUtil.Assert(cscl != null);
 
                 D_CheckStack(LuaDef.LUA_MINSTACK);
@@ -164,16 +156,14 @@ namespace CsharpLua
 
                 // do the actual call
                 int n = cscl.F(this);
-
                 // poscall
                 D_PosCall(Top.Index - n);
-
                 return true;
             }
-
             throw new System.NotImplementedException();
         }
 
+        // 调用函数后
         private int D_PosCall(int firstResultIndex)
         {
             // TODO: hook
@@ -260,14 +250,16 @@ namespace CsharpLua
             return stackBase;
         }
 
-        private StkId tryFuncTM(StkId func)
+        private StkId TryFuncTM(StkId func)
         {
             var tmObj = T_GetTMByObj(ref func.V, TMS.TM_CALL);
-            if (!tmObj.V.TtIsFunction())
+            if (!tmObj.V.TtIsFunction()) {
                 G_TypeError(func, "call");
-
+            }
             // open a hole inside the stack at `func'
-            for (int i = Top.Index; i > func.Index; --i) { Stack[i].V.SetObj(ref Stack[i - 1].V); }
+            for (int i = Top.Index; i > func.Index; --i) {
+                Stack[i].V.SetObj(ref Stack[i - 1].V);
+            }
 
             IncrTop();
             func.V.SetObj(ref tmObj.V);
@@ -276,11 +268,9 @@ namespace CsharpLua
 
         private void D_CheckStack(int n)
         {
-            if (StackLast - Top.Index <= n)
+            if (StackLast - Top.Index <= n) {
                 D_GrowStack(n);
-            // TODO: FOR DEBUGGING
-            // else
-            // 	CondMoveStack();
+            }
         }
 
         // some space for error handling
@@ -289,9 +279,9 @@ namespace CsharpLua
         private void D_GrowStack(int n)
         {
             int size = Stack.Length;
-            if (size > LuaConf.LUAI_MAXSTACK)
+            if (size > LuaConf.LUAI_MAXSTACK) {
                 D_Throw(ThreadStatus.LUA_ERRERR);
-
+            }
             int needed = Top.Index + n + LuaDef.EXTRA_STACK;
             int newsize = 2 * size;
             if (newsize > LuaConf.LUAI_MAXSTACK) { newsize = LuaConf.LUAI_MAXSTACK; }

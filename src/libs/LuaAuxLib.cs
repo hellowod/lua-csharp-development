@@ -260,13 +260,13 @@ namespace CsharpLua
 
         public void L_ArgCheck(bool cond, int narg, string extraMsg)
         {
-            if (!cond)
+            if (!cond) {
                 L_ArgError(narg, extraMsg);
+            }
         }
 
         public int L_ArgError(int narg, string extraMsg)
         {
-
             LuaDebug ar = new LuaDebug();
             if (!API.GetStack(0, ar)) // no stack frame ?
                 return L_Error("bad argument {0} ({1})", narg, extraMsg);
@@ -277,10 +277,10 @@ namespace CsharpLua
                 if (narg == 0) // error is in the self argument itself?
                     return L_Error("calling '{0}' on bad self", ar.Name);
             }
-            if (ar.Name == null)
+            if (ar.Name == null) {
                 ar.Name = PushGlobalFuncName(ar) ? API.ToString(-1) : "?";
-            return L_Error("bad argument {0} to '{1}' ({2})",
-                narg, ar.Name, extraMsg);
+            }
+            return L_Error("bad argument {0} to '{1}' ({2})", narg, ar.Name, extraMsg);
         }
 
         public string L_TypeName(int index)
@@ -316,18 +316,22 @@ namespace CsharpLua
 
         private void PushFuncName(LuaDebug ar)
         {
-            if (ar.NameWhat.Length > 0 && ar.NameWhat[0] != '\0') // is there a name?
+            if (ar.NameWhat.Length > 0 && ar.NameWhat[0] != '\0') {
+                // is there a name?
                 API.PushString(string.Format("function '{0}'", ar.Name));
-            else if (ar.What.Length > 0 && ar.What[0] == 'm') // main?
+            } else if (ar.What.Length > 0 && ar.What[0] == 'm') {
+                // main?
                 API.PushString("main chunk");
-            else if (ar.What.Length > 0 && ar.What[0] == 'C') {
+            } else if (ar.What.Length > 0 && ar.What[0] == 'C') {
                 if (PushGlobalFuncName(ar)) {
                     API.PushString(string.Format("function '{0}'", API.ToString(-1)));
                     API.Remove(-2); //remove name
-                } else
+                } else {
                     API.PushString("?");
-            } else
+                }
+            } else {
                 API.PushString(string.Format("function <{0}:{1}>", ar.ShortSrc, ar.LineDefined));
+            }
         }
 
         private int CountLevels()
@@ -387,8 +391,9 @@ namespace CsharpLua
 
             bool isnum;
             int l = (int)API.ToIntegerX(-1, out isnum);
-            if (!isnum)
+            if (!isnum) {
                 L_Error("object length is not a number");
+            }
             API.Pop(1);
             return l;
         }

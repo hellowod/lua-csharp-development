@@ -149,27 +149,24 @@ namespace CsharpLua
             API.CallK(numArgs, numResults, 0, null);
         }
 
-        void ILuaAPI.CallK(int numArgs, int numResults,
-            int context, CSharpFunctionDelegate continueFunc)
+        void ILuaAPI.CallK(int numArgs, int numResults, int context, CSharpFunctionDelegate continueFunc)
         {
-            LuaUtil.ApiCheck(continueFunc == null || !CI.IsLua,
-                "cannot use continuations inside hooks");
+            LuaUtil.ApiCheck(continueFunc == null || !CI.IsLua, "cannot use continuations inside hooks");
             LuaUtil.ApiCheckNumElems(this, numArgs + 1);
-            LuaUtil.ApiCheck(Status == ThreadStatus.LUA_OK,
-                "cannot do calls on non-normal thread");
+            LuaUtil.ApiCheck(Status == ThreadStatus.LUA_OK, "cannot do calls on non-normal thread");
             CheckResults(numArgs, numResults);
-            var func = Stack[Top.Index - (numArgs + 1)];
+
+            StkId func = Stack[Top.Index - (numArgs + 1)];
 
             // need to prepare continuation?
             if (continueFunc != null && NumNonYieldable == 0) {
                 CI.ContinueFunc = continueFunc;
                 CI.Context = context;
                 D_Call(func, numResults, true);
-            }
-            // no continuation or no yieldable
-            else {
+            } else {// no continuation or no yieldable
                 D_Call(func, numResults, false);
             }
+
             AdjustResults(numResults);
         }
 

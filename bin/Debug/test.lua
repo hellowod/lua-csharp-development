@@ -1,1 +1,1 @@
-string.upper("hello")
+print("hello world")
