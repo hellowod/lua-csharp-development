@@ -1306,9 +1306,9 @@ namespace CsharpLua
         bool ILuaAPI.ToBoolean(int index)
         {
             StkId addr;
-            if (!Index2Addr(index, out addr))
+            if (!Index2Addr(index, out addr)) {
                 return false;
-
+            }
             return !IsFalse(ref addr.V);
         }
 
@@ -1378,7 +1378,6 @@ namespace CsharpLua
                     addr = default(StkId);
                     return false;
                 }
-
                 addr = Stack[addrIndex];
                 return true;
             } else if (index > LuaDef.LUA_REGISTRYINDEX) {
@@ -1393,19 +1392,16 @@ namespace CsharpLua
                 LuaUtil.ApiCheck(index <= LuaLimits.MAXUPVAL + 1, "upvalue index too large");
                 var func = Stack[ci.FuncIndex];
                 LuaUtil.Assert(func.V.TtIsFunction());
-
                 if (func.V.ClIsLcsClosure()) {
                     addr = default(StkId);
                     return false;
                 }
-
                 LuaUtil.Assert(func.V.ClIsCsClosure());
                 var clcs = func.V.ClCsValue();
                 if (index > clcs.Upvals.Length) {
                     addr = default(StkId);
                     return false;
                 }
-
                 addr = clcs.Upvals[index - 1];
                 return true;
             }

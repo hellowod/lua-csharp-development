@@ -243,24 +243,22 @@ namespace CsharpLua
 			else ar.ShortSrc = ar.Source;
 		}
 
-		private void AddInfo( string msg )
-		{
-			// var api = (ILuaAPI)this;
-			// TODO
-			if( CI.IsLua )
-			{
-				var line = GetCurrentLine(CI);
-				var src = GetCurrentLuaFunc(CI).Proto.Source;
-				if( src == null )
-					src = "?";
-
-				// 不能用 PushString, 因为 PushString 是 API 接口
-				// API 接口中的 ApiIncrTop 会检查 Top 是否超过了 CI.Top 导致出错
-				// api.PushString( msg );
-				O_PushString( string.Format( "{0}:{1}: {2}",
-					src, line, msg ) );
-			}
-		}
+        private void AddInfo(string msg)
+        {
+            // var api = (ILuaAPI)this;
+            // TODO
+            if (CI.IsLua) {
+                var line = GetCurrentLine(CI);
+                var src = GetCurrentLuaFunc(CI).Proto.Source;
+                if (src == null) {
+                    src = "?";
+                }
+                // 不能用 PushString, 因为 PushString 是 API 接口
+                // API 接口中的 ApiIncrTop 会检查 Top 是否超过了 CI.Top 导致出错
+                // api.PushString( msg );
+                O_PushString(string.Format("{0}:{1}: {2}", src, line, msg));
+            }
+        }
 
 		internal void G_RunError( string fmt, params object[] args )
 		{
@@ -268,29 +266,28 @@ namespace CsharpLua
 			G_ErrorMsg();
 		}
 
-		private void G_ErrorMsg()
-		{
-			if( ErrFunc != 0 ) // is there an error handling function?
-			{
-				StkId errFunc = RestoreStack( ErrFunc );
+        private void G_ErrorMsg()
+        {
+            if (ErrFunc != 0) // is there an error handling function?
+            {
+                StkId errFunc = RestoreStack(ErrFunc);
 
-				if(!errFunc.V.TtIsFunction())
-					D_Throw( ThreadStatus.LUA_ERRERR );
+                if (!errFunc.V.TtIsFunction())
+                    D_Throw(ThreadStatus.LUA_ERRERR);
 
-				var below = Stack[Top.Index-1];
-				Top.V.SetObj(ref below.V);
-				below.V.SetObj(ref errFunc.V);
-				IncrTop();
-				
-				D_Call( below, 1, false );
-			}
+                var below = Stack[Top.Index - 1];
+                Top.V.SetObj(ref below.V);
+                below.V.SetObj(ref errFunc.V);
+                IncrTop();
 
-			D_Throw( ThreadStatus.LUA_ERRRUN );
-		}
+                D_Call(below, 1, false);
+            }
+
+            D_Throw(ThreadStatus.LUA_ERRRUN);
+        }
 
 		private string UpvalName( LuaProto p, int uv )
 		{
-			// TODO
 			return "(UpvalName:NotImplemented)";
 		}
 
