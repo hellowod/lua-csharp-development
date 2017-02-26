@@ -17,54 +17,51 @@ namespace CsharpLua
 
 	public struct Pointer<T>
 	{
-		private List<T> 	List;
-		public  int 		Index { get; set; }
+        private List<T> List;
+		public int Index { get; set; }
+        public delegate void LuaHookDelegate(ILuaState lua, LuaDebug ar);
 
-		public  T			Value
-		{
-			get
-			{
-				return List[Index];
-			}
-			set
-			{
-				List[Index] = value;
-			}
-		}
+        public T Value
+        {
+            get {
+                return List[Index];
+            }
+            set {
+                List[Index] = value;
+            }
+        }
 
-		public T			ValueInc
-		{
-			get
-			{
-				return List[Index++];
-			}
-			set
-			{
-				List[Index++] = value;
-			}
-		}
+		public T ValueInc
+        {
+            get {
+                return List[Index++];
+            }
+            set {
+                List[Index++] = value;
+            }
+        }
 
-		public Pointer( List<T> list, int index ) : this()
-		{
-			List = list;
-			Index = index;
-		}
+        public Pointer(List<T> list, int index) : this()
+        {
+            List = list;
+            Index = index;
+        }
 
-		public Pointer( Pointer<T> other ) : this()
-		{
-			List = other.List;
-			Index = other.Index;
-		}
+        public Pointer(Pointer<T> other) : this()
+        {
+            List = other.List;
+            Index = other.Index;
+        }
 
-		public static Pointer<T> operator +( Pointer<T> lhs, int rhs )
-		{
-			return new Pointer<T>( lhs.List, lhs.Index + rhs );
-		}
+        public static Pointer<T> operator +(Pointer<T> lhs, int rhs)
+        {
+            return new Pointer<T>(lhs.List, lhs.Index + rhs);
+        }
 
-		public static Pointer<T> operator -( Pointer<T> lhs, int rhs )
-		{
-			return new Pointer<T>( lhs.List, lhs.Index - rhs );
-		}
+        public static Pointer<T> operator -(Pointer<T> lhs, int rhs)
+        {
+            return new Pointer<T>(lhs.List, lhs.Index - rhs);
+        }
 	}
 
 	public enum CallStatus
@@ -133,8 +130,6 @@ namespace CsharpLua
 			MetaTables 	= new LuaTable[(int)LuaType.LUA_NUMTAGS];
 		}
 	}
-
-	public delegate void LuaHookDelegate(ILuaState lua, LuaDebug ar);
 
     // lua状态机（lua运行核心）
 	public partial class LuaState
@@ -306,6 +301,5 @@ namespace CsharpLua
 			HookCount = BaseHookCount;
 		}
 	}
-
 }
 

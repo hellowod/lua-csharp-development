@@ -1,5 +1,4 @@
-﻿
-// #define DEBUG_D_PRE_CALL
+﻿// #define DEBUG_D_PRE_CALL
 // #define DEBUG_D_POS_CALL
 
 namespace CsharpLua
@@ -325,6 +324,5 @@ namespace CsharpLua
             StackLast = size - LuaDef.EXTRA_STACK;
         }
     }
-
 }
 
