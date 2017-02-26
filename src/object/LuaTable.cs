@@ -25,27 +25,31 @@ namespace CsharpLua
 
         public StkId Get(ref TValue key)
         {
-            if (key.Tt == (int)LuaType.LUA_TNIL) { return TheNilValue; }
-
-            if (IsPositiveInteger(ref key)) { return GetInt((int)key.NValue); }
-
-            if (key.Tt == (int)LuaType.LUA_TSTRING) { return GetStr(key.SValue()); }
-
-            var h = key.GetHashCode();
+            if (key.Tt == (int)LuaType.LUA_TNIL) {
+                return TheNilValue;
+            }
+            if (IsPositiveInteger(ref key)) {
+                return GetInt((int)key.NValue);
+            }
+            if (key.Tt == (int)LuaType.LUA_TSTRING) {
+                return GetStr(key.SValue());
+            }
+            int h = key.GetHashCode();
             for (var node = GetHashNode(h); node != null; node = node.Next) {
                 if (node.Key.V == key) {
-                    { return node.Val; }
+                    return node.Val;
                 }
             }
-
             return TheNilValue;
         }
 
         public StkId GetInt(int key)
         {
-            if (0 < key && key - 1 < ArrayPart.Length) { return ArrayPart[key - 1]; }
+            if (0 < key && key - 1 < ArrayPart.Length) {
+                return ArrayPart[key - 1];
+            }
 
-            var k = new TValue();
+            TValue k = new TValue();
             k.SetNValue(key);
             for (var node = GetHashNode(ref k); node != null; node = node.Next) {
                 if (node.Key.V.TtIsNumber() && node.Key.V.NValue == (double)key) {
@@ -58,17 +62,18 @@ namespace CsharpLua
 
         public StkId GetStr(string key)
         {
-            var h = key.GetHashCode();
+            int h = key.GetHashCode();
             for (var node = GetHashNode(h); node != null; node = node.Next) {
-                if (node.Key.V.TtIsString() && node.Key.V.SValue() == key) { return node.Val; }
+                if (node.Key.V.TtIsString() && node.Key.V.SValue() == key) {
+                    return node.Val;
+                }
             }
-
             return TheNilValue;
         }
 
         public void Set(ref TValue key, ref TValue val)
         {
-            var cell = Get(ref key);
+            StkId cell = Get(ref key);
             if (cell == TheNilValue) {
                 cell = NewTableKey(ref key);
             }
@@ -77,36 +82,32 @@ namespace CsharpLua
 
         public void SetInt(int key, ref TValue val)
         {
-            var cell = GetInt(key);
+            StkId cell = GetInt(key);
             if (cell == TheNilValue) {
-                var k = new TValue();
+                TValue k = new TValue();
                 k.SetNValue(key);
                 cell = NewTableKey(ref k);
             }
             cell.V.SetObj(ref val);
-            // ULDebug.Log(string.Format("---------------- SetInt {0} -> {1}", key, val));
-            // DumpParts();
         }
 
-        /*
-		** returns the index of a `key' for table traversals. First goes all
-		** elements in the array part, then elements in the hash part. The
-		** beginning of a traversal is signaled by -1.
-		*/
         private int FindIndex(StkId key)
         {
-            if (key.V.TtIsNil()) { return -1; }
-
+            if (key.V.TtIsNil()) {
+                return -1;
+            }
             // is `key' inside array part?
             int i = ArrayIndex(ref key.V);
-            if (0 < i && i <= ArrayPart.Length) { return i - 1; }
-
-            var n = GetHashNode(ref key.V);
+            if (0 < i && i <= ArrayPart.Length) {
+                return i - 1;
+            }
+            HNode n = GetHashNode(ref key.V);
             // check whether `key' is somewhere in the chain
             for (;;) {
-                if (L.V_RawEqualObj(ref n.Key.V, ref key.V)) { return ArrayPart.Length + n.Index; }
+                if (L.V_RawEqualObj(ref n.Key.V, ref key.V)) {
+                    return ArrayPart.Length + n.Index;
+                }
                 n = n.Next;
-
                 // key not found
                 if (n == null) { L.G_RunError("invalid key to 'next'"); }
             }
@@ -160,23 +161,27 @@ namespace CsharpLua
         public void Resize(int nasize, int nhsize)
         {
             int oasize = ArrayPart.Length;
-            var oldHashPart = HashPart;
-            if (nasize > oasize) // array part must grow?
+            HNode[] oldHashPart = HashPart;
+            if (nasize > oasize) {
+                // array part must grow?
                 SetArraryVector(nasize);
+            }
 
             // create new hash part with appropriate size
             SetNodeVector(nhsize);
 
             // array part must shrink?
             if (nasize < oasize) {
-                var oldArrayPart = ArrayPart;
+                StkId[] oldArrayPart = ArrayPart;
                 ArrayPart = DummyArrayPart;
                 // re-insert elements from vanishing slice
                 for (int i = nasize; i < oasize; ++i) {
-                    if (!oldArrayPart[i].V.TtIsNil()) { SetInt(i + 1, ref oldArrayPart[i].V); }
+                    if (!oldArrayPart[i].V.TtIsNil()) {
+                        SetInt(i + 1, ref oldArrayPart[i].V);
+                    }
                 }
                 // shrink array
-                var newArrayPart = new StkId[nasize];
+                StkId[] newArrayPart = new StkId[nasize];
                 for (int i = 0; i < nasize; ++i) {
                     newArrayPart[i] = oldArrayPart[i];
                 }
@@ -185,21 +190,15 @@ namespace CsharpLua
 
             // re-insert elements from hash part
             for (int i = 0; i < oldHashPart.Length; ++i) {
-                var node = oldHashPart[i];
+                HNode node = oldHashPart[i];
                 if (!node.Val.V.TtIsNil()) {
                     Set(ref node.Key.V, ref node.Val.V);
                 }
             }
-
-            if (oldHashPart != DummyHashPart)
+            if (oldHashPart != DummyHashPart) {
                 RecycleHNode(oldHashPart);
+            }
         }
-
-        //-----------------------------------------
-        //
-        // **** PRIVATE below ****
-        //
-        //-----------------------------------------
 
         private class HNode
         {
@@ -319,18 +318,19 @@ namespace CsharpLua
 
         private HNode GetHashNode(ref TValue v)
         {
-            if (IsPositiveInteger(ref v)) { return GetHashNode((int)v.NValue); }
-
-            if (v.TtIsString()) { return GetHashNode(v.SValue().GetHashCode()); }
-
+            if (IsPositiveInteger(ref v)) {
+                return GetHashNode((int)v.NValue);
+            }
+            if (v.TtIsString()) {
+                return GetHashNode(v.SValue().GetHashCode());
+            }
             return GetHashNode(v.GetHashCode());
         }
 
         private void SetArraryVector(int size)
         {
             LuaUtil.Assert(size >= ArrayPart.Length);
-
-            var newArrayPart = new StkId[size];
+            StkId[] newArrayPart = new StkId[size];
             int i = 0;
             for (; i < ArrayPart.Length; ++i) {
                 newArrayPart[i] = ArrayPart[i];
@@ -351,7 +351,9 @@ namespace CsharpLua
             }
 
             int lsize = CeilLog2(size);
-            if (lsize > MAXBITS) { L.G_RunError("table overflow"); }
+            if (lsize > MAXBITS) {
+                L.G_RunError("table overflow");
+            }
 
             size = (1 << lsize);
             HashPart = new HNode[size];
@@ -365,25 +367,25 @@ namespace CsharpLua
         private HNode GetFreePos()
         {
             while (LastFree > 0) {
-                var node = HashPart[--LastFree];
-                if (node.Key.V.TtIsNil()) { return node; }
+                HNode node = HashPart[--LastFree];
+                if (node.Key.V.TtIsNil()) {
+                    return node;
+                }
             }
             return null;
         }
 
-        /*
-		** returns the index for `key' if `key' is an appropriate key to live in
-		** the array part of the table, -1 otherwise.
-		*/
         private int ArrayIndex(ref TValue k)
         {
-            if (IsPositiveInteger(ref k))
+            if (IsPositiveInteger(ref k)) {
                 return (int)k.NValue;
-            else
+            } else {
                 return -1;
+            }
         }
 
-        private static readonly byte[] Log2_ = new byte[] {
+        private static readonly byte[] Log2_ = new byte[] 
+        {
             0,1,2,2,3,3,3,3,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
             6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
             7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
@@ -393,12 +395,15 @@ namespace CsharpLua
             8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,
             8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8
         };
+
         private int CeilLog2(int x)
         {
             LuaUtil.Assert(x > 0);
             int l = 0;
             x--;
-            while (x >= 256) { l += 8; x >>= 8; }
+            while (x >= 256) {
+                l += 8; x >>= 8;
+            }
             return l + Log2_[x];
         }
 
@@ -408,7 +413,9 @@ namespace CsharpLua
             if (0 < k && k <= MAXASIZE) {
                 nums[CeilLog2(k)]++;
                 return 1;
-            } else return 0;
+            } else {
+                return 0;
+            }
         }
 
         private int NumUseArray(ref int[] nums)
@@ -462,7 +469,9 @@ namespace CsharpLua
                         na = a;
                     }
                 }
-                if (a == nasize) { break; } // all elements already conted
+                if (a == nasize) {
+                    break;
+                } // all elements already conted
             }
             nasize = n;
             LuaUtil.Assert(nasize / 2 <= na && na <= nasize);
@@ -472,7 +481,9 @@ namespace CsharpLua
         private static int[] Nums = new int[MAXBITS + 1];
         private void Rehash(ref TValue k)
         {
-            for (int i = 0; i <= MAXBITS; ++i) { Nums[i] = 0; }
+            for (int i = 0; i <= MAXBITS; ++i) {
+                Nums[i] = 0;
+            }
 
             int nasize = NumUseArray(ref Nums);
             int totaluse = nasize;
@@ -502,34 +513,37 @@ namespace CsharpLua
 
         private StkId NewTableKey(ref TValue k)
         {
-            if (k.TtIsNil()) { L.G_RunError("table index is nil"); }
-
-            if (k.TtIsNumber() && System.Double.IsNaN(k.NValue)) { L.G_RunError("table index is NaN"); }
-
-            var mp = GetHashNode(ref k);
-
+            if (k.TtIsNil()) {
+                L.G_RunError("table index is nil");
+            }
+            if (k.TtIsNumber() && System.Double.IsNaN(k.NValue)) {
+                L.G_RunError("table index is NaN");
+            }
+            HNode mp = GetHashNode(ref k);
             // if main position is taken
             if (!mp.Val.V.TtIsNil() || mp == DummyNode) {
-                var n = GetFreePos();
+                HNode n = GetFreePos();
                 if (n == null) {
                     Rehash(ref k);
                     var cell = Get(ref k);
-                    if (cell != TheNilValue) { return cell; }
+                    if (cell != TheNilValue) {
+                        return cell;
+                    }
                     return NewTableKey(ref k);
                 }
-
                 LuaUtil.Assert(n != DummyNode);
                 var othern = GetHashNode(ref mp.Key.V);
                 // is colliding node out of its main position?
                 if (othern != mp) {
-                    while (othern.Next != mp) { othern = othern.Next; }
+                    while (othern.Next != mp) {
+                        othern = othern.Next;
+                    }
                     othern.Next = n;
                     n.CopyFrom(mp);
                     mp.Next = null;
                     mp.Val.V.SetNilValue();
-                }
-                // colliding node is in its own main position
-                else {
+                } else {
+                    // colliding node is in its own main position
                     n.Next = mp.Next;
                     mp.Next = n;
                     mp = n;
