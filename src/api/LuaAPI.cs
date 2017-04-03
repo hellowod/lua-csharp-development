@@ -2,7 +2,7 @@
 
 // #define DEBUG_RECORD_INS
 
-namespace CsharpLua
+namespace LuaCsharp
 {
     public interface ILoadInfo
     {

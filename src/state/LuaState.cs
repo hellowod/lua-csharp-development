@@ -10,10 +10,10 @@ using System.Collections.Generic;
  * 
  * lua状态机，这是lua设计的核心数据结构，lua堆栈结构都是定义在这个文里面里面
  */ 
-namespace CsharpLua
+namespace LuaCsharp
 {
 	using InstructionPtr = Pointer<Instruction>;
-	using ULDebug = CsharpLua.Tools.CsLDebug;
+	using ULDebug = LuaCsharp.Tools.CsLDebug;
 
 	public struct Pointer<T>
 	{

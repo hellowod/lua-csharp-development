@@ -1,9 +1,9 @@
 ﻿// #define DEBUG_FIND_UPVALUE
 
 using System.Collections.Generic;
-using ULDebug = CsharpLua.Tools.CsLDebug;
+using ULDebug = LuaCsharp.Tools.CsLDebug;
 
-namespace CsharpLua
+namespace LuaCsharp
 {
 	public partial class LuaState
 	{

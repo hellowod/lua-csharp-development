@@ -1,5 +1,5 @@
 ﻿
-namespace CsharpLua
+namespace LuaCsharp
 {
 	public class LuaDebug
 	{

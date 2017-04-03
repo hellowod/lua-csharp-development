@@ -3,9 +3,9 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 
-using ULDebug = CsharpLua.Tools.CsLDebug;
+using ULDebug = LuaCsharp.Tools.CsLDebug;
 
-namespace CsharpLua
+namespace LuaCsharp
 {
     using InstructionPtr = Pointer<Instruction>;
 

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CsharpLua.Tools
+namespace LuaCsharp.Tools
 {
 	public class CsLDebug
 	{

@@ -3,7 +3,7 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 
-namespace CsharpLua
+namespace LuaCsharp
 {
 	public enum DumpStatus
 	{

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 using NumberStyles = System.Globalization.NumberStyles;
 
-namespace CsharpLua
+namespace LuaCsharp
 {
     public class LLexException : Exception
     {

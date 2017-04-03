@@ -1,9 +1,9 @@
 ﻿// #define DEBUG_D_PRE_CALL
 // #define DEBUG_D_POS_CALL
 
-namespace CsharpLua
+namespace LuaCsharp
 {
-    using ULDebug = CsharpLua.Tools.CsLDebug;
+    using ULDebug = LuaCsharp.Tools.CsLDebug;
     using InstructionPtr = Pointer<Instruction>;
     using Exception = System.Exception;
 

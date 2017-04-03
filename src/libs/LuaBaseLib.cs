@@ -1,9 +1,9 @@
-﻿using ULDebug = CsharpLua.Tools.CsLDebug;
+﻿using ULDebug = LuaCsharp.Tools.CsLDebug;
 using StringBuilder = System.Text.StringBuilder;
 using Char = System.Char;
 using Int32 = System.Int32;
 
-namespace CsharpLua
+namespace LuaCsharp
 {
     internal static class LuaBaseLib
     {

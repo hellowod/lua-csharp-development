@@ -4,11 +4,12 @@
  * Lua.cs
  * 
  * @author abaojin
- * 
- * lua 启动程序入口，目前可以直接传入lua文件的路径
  */
-namespace CsharpLua
+namespace LuaCsharp
 {
+    /// <summary>
+    /// lua 启动程序入口，目前可以直接传入lua文件的路径
+    /// </summary>
     public class Lua
     {
         private static string ScriptFile;

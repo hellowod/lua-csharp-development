@@ -1,5 +1,5 @@
 ﻿
-namespace CsharpLua
+namespace LuaCsharp
 {
 	using System.Collections.Generic;
 

@@ -1,11 +1,11 @@
 ﻿
 // #define DEBUG_DUMMY_TVALUE_MODIFY
 
-namespace CsharpLua
+namespace LuaCsharp
 {
     using System;
     using System.Collections.Generic;
-    using ULDebug = CsharpLua.Tools.CsLDebug;
+    using ULDebug = LuaCsharp.Tools.CsLDebug;
 
     public struct TValue
     {

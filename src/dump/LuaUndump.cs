@@ -4,7 +4,7 @@
 
 using System;
 
-namespace CsharpLua
+namespace LuaCsharp
 {
     public class BinaryBytesReader
     {

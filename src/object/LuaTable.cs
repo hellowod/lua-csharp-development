@@ -4,9 +4,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace CsharpLua
+namespace LuaCsharp
 {
-	using ULDebug = CsharpLua.Tools.CsLDebug;
+	using ULDebug = LuaCsharp.Tools.CsLDebug;
 
     public class LuaTable
     {

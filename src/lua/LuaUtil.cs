@@ -4,7 +4,7 @@
 
 using System;
 
-namespace CsharpLua
+namespace LuaCsharp
 {
 	using DebugS = System.Diagnostics.Debug;
 	using NumberStyles = System.Globalization.NumberStyles;

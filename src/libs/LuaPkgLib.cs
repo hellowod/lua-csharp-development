@@ -3,7 +3,7 @@
 
 #define LUA_COMPAT_LOADERS
 
-namespace CsharpLua
+namespace LuaCsharp
 {
 	using Environment = System.Environment;
 	using StringBuilder = System.Text.StringBuilder;

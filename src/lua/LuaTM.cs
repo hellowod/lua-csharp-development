@@ -1,6 +1,6 @@
 ﻿// Lua Tag Method
 
-namespace CsharpLua
+namespace LuaCsharp
 {
 	// grep `NoTagMethodFlags' if num of TMS >= 32
 	internal enum TMS

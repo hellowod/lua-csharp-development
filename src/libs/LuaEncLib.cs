@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace CsharpLua
+namespace LuaCsharp
 {
 	class LuaEncLib
 	{

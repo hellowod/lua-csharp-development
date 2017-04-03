@@ -22,7 +22,7 @@ using System.Collections.Generic;
  * lua虚拟机，关键函数是执行lua指令，函数如口：V_Execute
  * 
  */
-namespace CsharpLua
+namespace LuaCsharp
 {
     using ULDebug = Tools.CsLDebug;
     using StringBuilder = System.Text.StringBuilder;

@@ -1,7 +1,7 @@
 ﻿
 using NotImplementedException = System.NotImplementedException;
 
-namespace CsharpLua
+namespace LuaCsharp
 {
     using InstructionPtr = Pointer<Instruction>;
     using Math = System.Math;

@@ -1,31 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CsharpLua
+namespace LuaCsharp
 {
-    internal class ByteStringBuilder
+    public class ByteStringBuilder
     {
-        private LinkedList<byte[]> BufList;
+        private LinkedList<byte[]> BuffList;
         private int TotalLength;
 
         public ByteStringBuilder()
         {
-            BufList = new LinkedList<byte[]>();
+            BuffList = new LinkedList<byte[]>();
             TotalLength = 0;
         }
 
         public override string ToString()
         {
-            if (TotalLength <= 0)
+            if (TotalLength <= 0) {
                 return String.Empty;
+            }
+                
 
-            var result = new char[TotalLength];
-            var i = 0;
-            var node = BufList.First;
+            char[] result = new char[TotalLength];
+            int i = 0;
+            LinkedListNode<byte[]> node = BuffList.First;
             while (node != null) {
-                var buf = node.Value;
-                for (var j = 0; j < buf.Length; ++j) {
-                    result[i++] = (char)buf[j];
+                byte[] buff = node.Value;
+                for (int j = 0; j < buff.Length; ++j) {
+                    result[i++] = (char)buff[j];
                 }
                 node = node.Next;
             }
@@ -34,9 +36,9 @@ namespace CsharpLua
 
         public ByteStringBuilder Append(byte[] bytes, int start, int length)
         {
-            var buf = new byte[length];
+            byte[] buf = new byte[length];
             Array.Copy(bytes, start, buf, 0, length);
-            BufList.AddLast(buf);
+            BuffList.AddLast(buf);
             TotalLength += length;
             return this;
         }

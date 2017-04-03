@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CsharpLua
+namespace LuaCsharp
 {
     public interface ILuaAPI
     {

@@ -1,5 +1,5 @@
 ﻿
-namespace CsharpLua
+namespace LuaCsharp
 {
 	using StringBuilder = System.Text.StringBuilder;
 	using Char = System.Char;
