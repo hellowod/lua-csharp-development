@@ -200,9 +200,9 @@ namespace LuaCsharp
 
         ThreadStatus ILuaAPI.PCallK(int numArgs, int numResults, int errFunc, int context, CSharpFunctionDelegate continueFunc)
         {
-            LuaUtil.ApiCheck(continueFunc == null || !CI.IsLua,"cannot use continuations inside hooks");
+            LuaUtil.ApiCheck(continueFunc == null || !CI.IsLua, "cannot use continuations inside hooks");
             LuaUtil.ApiCheckNumElems(this, numArgs + 1);
-            LuaUtil.ApiCheck(Status == ThreadStatus.LUA_OK,"cannot do calls on non-normal thread");
+            LuaUtil.ApiCheck(Status == ThreadStatus.LUA_OK, "cannot do calls on non-normal thread");
             CheckResults(numArgs, numResults);
 
             int func;
@@ -1053,7 +1053,9 @@ namespace LuaCsharp
                 LuaCsClosureValue cscl = new LuaCsClosureValue(f, n);
                 int index = Top.Index - n;
                 Top = Stack[index];
-                for (int i = 0; i < n; ++i) { cscl.Upvals[i].V.SetObj(ref Stack[index + i].V); }
+                for (int i = 0; i < n; ++i) {
+                    cscl.Upvals[i].V.SetObj(ref Stack[index + i].V);
+                }
 
                 Top.V.SetClCsValue(cscl);
             }
@@ -1063,8 +1065,9 @@ namespace LuaCsharp
         void ILuaAPI.PushValue(int index)
         {
             StkId addr;
-            if (!Index2Addr(index, out addr))
+            if (!Index2Addr(index, out addr)) {
                 LuaUtil.InvalidIndex();
+            }
 
             Top.V.SetObj(ref addr.V);
             ApiIncrTop();
@@ -1102,8 +1105,9 @@ namespace LuaCsharp
         bool ILuaAPI.GetMetaTable(int index)
         {
             StkId addr;
-            if (!Index2Addr(index, out addr))
+            if (!Index2Addr(index, out addr)) {
                 LuaUtil.InvalidIndex();
+            }
 
             LuaTable mt;
             switch (addr.V.Tt) {
@@ -1122,9 +1126,9 @@ namespace LuaCsharp
                         break;
                     }
             }
-            if (mt == null)
+            if (mt == null) {
                 return false;
-            else {
+            } else {
                 Top.V.SetHValue(mt);
                 ApiIncrTop();
                 return true;
@@ -1136,14 +1140,15 @@ namespace LuaCsharp
             LuaUtil.ApiCheckNumElems(this, 1);
 
             StkId addr;
-            if (!Index2Addr(index, out addr))
+            if (!Index2Addr(index, out addr)) {
                 LuaUtil.InvalidIndex();
+            }
 
-            var below = Stack[Top.Index - 1];
+            StkId below = Stack[Top.Index - 1];
             LuaTable mt;
-            if (below.V.TtIsNil())
+            if (below.V.TtIsNil()) {
                 mt = null;
-            else {
+            } else {
                 LuaUtil.ApiCheck(below.V.TtIsTable(), "table expected");
                 mt = below.V.HValue();
             }
@@ -1177,7 +1182,7 @@ namespace LuaCsharp
 
         void ILuaAPI.SetGlobal(string name)
         {
-            var gt = G.Registry.V.HValue().GetInt(LuaDef.LUA_RIDX_GLOBALS);
+            StkId gt = G.Registry.V.HValue().GetInt(LuaDef.LUA_RIDX_GLOBALS);
             StkId.inc(ref Top).V.SetSValue(name);
             V_SetTable(gt, Stack[Top.Index - 1], Stack[Top.Index - 2]);
             Top = Stack[Top.Index - 2];
@@ -1186,8 +1191,9 @@ namespace LuaCsharp
         string ILuaAPI.ToString(int index)
         {
             StkId addr;
-            if (!Index2Addr(index, out addr))
+            if (!Index2Addr(index, out addr)) {
                 return null;
+            }
 
             if (addr.V.TtIsString()) {
                 return addr.V.OValue as string;
@@ -1197,8 +1203,9 @@ namespace LuaCsharp
                 return null;
             }
 
-            if (!Index2Addr(index, out addr))
+            if (!Index2Addr(index, out addr)) {
                 return null;
+            }
 
             LuaUtil.Assert(addr.V.TtIsString());
             return addr.V.OValue as string;
@@ -1218,7 +1225,7 @@ namespace LuaCsharp
             }
 
             if (addr.V.TtIsString()) {
-                var n = new TValue();
+                TValue n = new TValue();
                 if (V_ToNumber(addr, ref n)) {
                     isnum = true;
                     return n.NValue;
@@ -1332,8 +1339,9 @@ namespace LuaCsharp
         object ILuaAPI.ToObject(int index)
         {
             StkId addr;
-            if (!Index2Addr(index, out addr))
+            if (!Index2Addr(index, out addr)) {
                 return null;
+            }
 
             return addr.V.OValue;
         }
@@ -1341,8 +1349,9 @@ namespace LuaCsharp
         object ILuaAPI.ToUserData(int index)
         {
             StkId addr;
-            if (!Index2Addr(index, out addr))
+            if (!Index2Addr(index, out addr)) {
                 return null;
+            }
 
             switch (addr.V.Tt) {
                 case (int)LuaType.LUA_TUSERDATA:
