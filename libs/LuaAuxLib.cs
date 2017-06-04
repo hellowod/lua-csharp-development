@@ -580,9 +580,10 @@ namespace LuaCsharp
         {
             // TODO: Check Version
             L_CheckStack(nup, "too many upvalues");
-            for (var j = 0; j < define.Length; ++j) {
-                for (int i = 0; i < nup; ++i)
+            for (int j = 0; j < define.Length; ++j) {
+                for (int i = 0; i < nup; ++i) {
                     API.PushValue(-nup);
+                }
                 API.PushCSharpClosure(define[j].Func, nup);
                 API.SetField(-(nup + 2), define[j].Name);
             }

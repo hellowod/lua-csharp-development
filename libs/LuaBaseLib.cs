@@ -9,6 +9,7 @@ namespace LuaCsharp
     {
         public static int OpenLib(ILuaState lua)
         {
+            // 23个函数
             NameFuncPair[] define = new NameFuncPair[]
             {
                 new NameFuncPair( "assert",         LuaBaseLib.B_Assert ),
