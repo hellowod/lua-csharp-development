@@ -140,12 +140,6 @@ namespace LuaCsharp
 
         void ILuaAPI.Call(int numArgs, int numResults)
         {
-            // StkId func = Top - (numArgs + 1);
-            // if( !D_PreCall( func, numResults ) )
-            // {
-            // 	V_Execute();
-            // }
-
             API.CallK(numArgs, numResults, 0, null);
         }
 

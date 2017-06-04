@@ -52,7 +52,7 @@
     <Compile Include="api\ILuaAPI.cs" />
     <Compile Include="lua\LuaByteString.cs" />
     <Compile Include="luac\LuaCoder.cs" />
-    <Compile Include="object\LuaConf.cs" />
+    <Compile Include="conf\LuaConf.cs" />
     <Compile Include="state\LuaDo.cs" />
     <Compile Include="dump\LuaDump.cs" />
     <Compile Include="luac\LuaLex.cs" />

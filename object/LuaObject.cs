@@ -7,19 +7,29 @@ namespace LuaCsharp
     using System.Collections.Generic;
     using ULDebug = LuaCsharp.Tools.CsLDebug;
 
+    /// <summary>
+    /// lua数据类型对象
+    /// </summary>
     public struct TValue
     {
-        private const UInt64 CLOSURE_LUA = 0; // lua closure
-        private const UInt64 CLOSURE_CS = 1; // c# closure
-        private const UInt64 CLOSURE_LCS = 2; // light c# closure
+        // lua closure
+        private const UInt64 CLOSURE_LUA = 0;
+        // c# closure 
+        private const UInt64 CLOSURE_CS = 1;
+        // light c# closure
+        private const UInt64 CLOSURE_LCS = 2; 
 
+        // true | false
         private const UInt64 BOOLEAN_FALSE = 0;
         private const UInt64 BOOLEAN_TRUE = 1;
 
         public int Tt;
         public double NValue;
         public UInt64 UInt64Value;
+
+        // 值对象
         public object OValue;
+
 #if DEBUG_DUMMY_TVALUE_MODIFY
 		public bool Lock_;
 #endif
@@ -30,14 +40,20 @@ namespace LuaCsharp
                 ^ UInt64Value.GetHashCode()
                 ^ (OValue != null ? OValue.GetHashCode() : 0x12345678);
         }
+
         public override bool Equals(object o)
         {
-            if (!(o is TValue)) return false;
+            if (!(o is TValue)) {
+                return false;
+            }
             return Equals((TValue)o);
         }
+
         public bool Equals(TValue o)
         {
-            if (Tt != o.Tt || NValue != o.NValue || UInt64Value != o.UInt64Value) { return false; }
+            if (Tt != o.Tt || NValue != o.NValue || UInt64Value != o.UInt64Value) {
+                return false;
+            }
 
             switch (Tt) {
                 case (int)LuaType.LUA_TNIL: return true;
@@ -48,42 +64,94 @@ namespace LuaCsharp
                 default: return System.Object.ReferenceEquals(OValue, o.OValue);
             }
         }
+
         public static bool operator ==(TValue lhs, TValue rhs)
         {
             return lhs.Equals(rhs);
         }
+
         public static bool operator !=(TValue lhs, TValue rhs)
         {
             return !lhs.Equals(rhs);
         }
 
 #if DEBUG_DUMMY_TVALUE_MODIFY
-		private void CheckLock() {
+		private void CheckLock() 
+        {
 			if(Lock_) {
 				ULDebug.LogError("changing a lock value");
 			}
 		}
 #endif
 
-        internal bool TtIsNil() { return Tt == (int)LuaType.LUA_TNIL; }
-        internal bool TtIsBoolean() { return Tt == (int)LuaType.LUA_TBOOLEAN; }
-        internal bool TtIsNumber() { return Tt == (int)LuaType.LUA_TNUMBER; }
-        internal bool TtIsUInt64() { return Tt == (int)LuaType.LUA_TUINT64; }
-        internal bool TtIsString() { return Tt == (int)LuaType.LUA_TSTRING; }
-        internal bool TtIsTable() { return Tt == (int)LuaType.LUA_TTABLE; }
-        internal bool TtIsFunction() { return Tt == (int)LuaType.LUA_TFUNCTION; }
-        internal bool TtIsThread() { return Tt == (int)LuaType.LUA_TTHREAD; }
-
-        internal bool ClIsLuaClosure() { return UInt64Value == CLOSURE_LUA; }
-        internal bool ClIsCsClosure() { return UInt64Value == CLOSURE_CS; }
-        internal bool ClIsLcsClosure() { return UInt64Value == CLOSURE_LCS; }
-
-        internal bool BValue() { return UInt64Value != BOOLEAN_FALSE; }
-        internal string SValue() { return (string)OValue; }
-        internal LuaTable HValue() { return OValue as LuaTable; }
-        internal LuaLClosureValue ClLValue() { return (LuaLClosureValue)OValue; }
-        internal LuaCsClosureValue ClCsValue() { return (LuaCsClosureValue)OValue; }
-        internal LuaUserDataValue RawUValue() { return OValue as LuaUserDataValue; }
+        internal bool TtIsNil()
+        {
+            return Tt == (int)LuaType.LUA_TNIL;
+        }
+        internal bool TtIsBoolean()
+        {
+            return Tt == (int)LuaType.LUA_TBOOLEAN;
+        }
+        internal bool TtIsNumber()
+        {
+            return Tt == (int)LuaType.LUA_TNUMBER;
+        }
+        internal bool TtIsUInt64()
+        {
+            return Tt == (int)LuaType.LUA_TUINT64;
+        }
+        internal bool TtIsString()
+        {
+            return Tt == (int)LuaType.LUA_TSTRING;
+        }
+        internal bool TtIsTable()
+        {
+            return Tt == (int)LuaType.LUA_TTABLE;
+        }
+        internal bool TtIsFunction()
+        {
+            return Tt == (int)LuaType.LUA_TFUNCTION;
+        }
+        internal bool TtIsThread()
+        {
+            return Tt == (int)LuaType.LUA_TTHREAD;
+        }
+        internal bool ClIsLuaClosure()
+        {
+            return UInt64Value == CLOSURE_LUA;
+        }
+        internal bool ClIsCsClosure()
+        {
+            return UInt64Value == CLOSURE_CS;
+        }
+        internal bool ClIsLcsClosure()
+        {
+            return UInt64Value == CLOSURE_LCS;
+        }
+        internal bool BValue()
+        {
+            return UInt64Value != BOOLEAN_FALSE;
+        }
+        internal string SValue()
+        {
+            return (string)OValue;
+        }
+        internal LuaTable HValue()
+        {
+            return OValue as LuaTable;
+        }
+        internal LuaLClosureValue ClLValue()
+        {
+            return (LuaLClosureValue)OValue;
+        }
+        internal LuaCsClosureValue ClCsValue()
+        {
+            return (LuaCsClosureValue)OValue;
+        }
+        internal LuaUserDataValue RawUValue()
+        {
+            return OValue as LuaUserDataValue;
+        }
 
         internal void SetNilValue()
         {
@@ -185,6 +253,7 @@ namespace LuaCsharp
             UInt64Value = CLOSURE_LUA;
             OValue = v;
         }
+
         internal void SetClCsValue(LuaCsClosureValue v)
         {
 #if DEBUG_DUMMY_TVALUE_MODIFY
@@ -205,7 +274,6 @@ namespace LuaCsharp
             UInt64Value = CLOSURE_LCS;
             OValue = v;
         }
-
         public override string ToString()
         {
             if (TtIsString()) {
@@ -220,19 +288,34 @@ namespace LuaCsharp
         }
     }
 
+    /// <summary>
+    /// lua栈对象
+    /// </summary>
     public class StkId
     {
         public TValue V;
 
         private StkId[] List;
-        public int Index { get; private set; }
 
-        public void SetList(StkId[] list) { List = list; }
-        public void SetIndex(int index) { Index = index; }
+        public int Index
+        {
+            get;
+            private set;
+        }
+
+        public void SetList(StkId[] list)
+        {
+            List = list;
+        }
+
+        public void SetIndex(int index)
+        {
+            Index = index;
+        }
 
         public static StkId inc(ref StkId val)
         {
-            var ret = val;
+            StkId ret = val;
             val = val.List[val.Index + 1];
             return ret;
         }

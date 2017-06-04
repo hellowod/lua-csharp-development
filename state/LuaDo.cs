@@ -100,7 +100,12 @@ namespace LuaCsharp
             NumCSharpCalls--;
         }
 
-        // 调用函数前
+        /// <summary>
+        /// 调用函数
+        /// </summary>
+        /// <param name="func"></param>
+        /// <param name="nResults"></param>
+        /// <returns></returns>
         private bool D_PreCall(StkId func, int nResults)
         {
             int funcIndex = func.Index;
@@ -111,6 +116,8 @@ namespace LuaCsharp
                 // now it must be a function
                 return D_PreCall(func, nResults);
             }
+
+            // lua函数
             if (func.V.ClIsLuaClosure()) {
                 LuaLClosureValue cl = func.V.ClLValue();
                 LuaUtil.Assert(cl != null);
@@ -141,6 +148,7 @@ namespace LuaCsharp
                 return false;
             }
 
+            // cs函数
             if (func.V.ClIsCsClosure()) {
                 LuaCsClosureValue cscl = func.V.ClCsValue();
                 LuaUtil.Assert(cscl != null);
@@ -160,6 +168,7 @@ namespace LuaCsharp
                 D_PosCall(Top.Index - n);
                 return true;
             }
+
             throw new System.NotImplementedException();
         }
 

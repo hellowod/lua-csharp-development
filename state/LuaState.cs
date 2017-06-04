@@ -77,6 +77,9 @@ namespace LuaCsharp
 		CIST_TAIL		= (1<<6),	/* call was tail called */
 	}
 
+    /// <summary>
+    /// 调用帧信息
+    /// </summary>
 	public class CallInfo
 	{
 		public CallInfo[] List;
@@ -114,6 +117,9 @@ namespace LuaCsharp
 		}
 	}
 
+    /// <summary>
+    /// 全局状态机
+    /// </summary>
 	public class GlobalState
 	{
 		public StkId		Registry;
@@ -130,16 +136,24 @@ namespace LuaCsharp
 		}
 	}
 
-    // lua状态机（lua运行核心）
+    /// <summary>
+    /// lua状态机（lua运行核心）
+    /// </summary>
     public partial class LuaState
     {
+        // 栈信息
         public StkId[] Stack;
         public StkId Top;
         public int StackSize;
         public int StackLast;
-        public CallInfo CI;
+
+        // CallInfo
         public CallInfo[] BaseCI;
+        public CallInfo CI;
+        
+        // 全局栈
         public GlobalState G;
+
         public int NumNonYieldable;
         public int NumCSharpCalls;
         public int ErrFunc;
@@ -166,7 +180,7 @@ namespace LuaCsharp
             TheNilValue.V.SetNilValue();
         }
 
-        public LuaState(GlobalState g = null)
+        public LuaState(GlobalState gState = null)
         {
             API = (ILuaAPI)this;
 
@@ -179,11 +193,11 @@ namespace LuaCsharp
             ResetHookCount();
             Status = ThreadStatus.LUA_OK;
 
-            if (g == null) {
+            if (gState == null) {
                 G = new GlobalState(this);
                 InitRegistry();
             } else {
-                G = g;
+                G = gState;
             }
             OpenUpval = new LinkedList<LuaUpvalue>();
             ErrFunc = 0;
@@ -191,7 +205,6 @@ namespace LuaCsharp
 #if DEBUG_RECORD_INS
 			InstructionHistory = new Queue<Instruction>();
 #endif
-
             InitStack();
         }
 
@@ -220,30 +233,31 @@ namespace LuaCsharp
             StackSize = LuaDef.BASIC_STACK_SIZE;
             StackLast = LuaDef.BASIC_STACK_SIZE - LuaDef.EXTRA_STACK;
             for (int i = 0; i < LuaDef.BASIC_STACK_SIZE; ++i) {
-                var newItem = new StkId();
-                Stack[i] = newItem;
-                newItem.SetList(Stack);
-                newItem.SetIndex(i);
-                newItem.V.SetNilValue();
+                StkId newSI = new StkId();
+                Stack[i] = newSI;
+                newSI.SetList(Stack);
+                newSI.SetIndex(i);
+                newSI.V.SetNilValue();
             }
             Top = Stack[0];
 
             BaseCI = new CallInfo[LuaDef.BASE_CI_SIZE];
             for (int i = 0; i < LuaDef.BASE_CI_SIZE; ++i) {
-                var newCI = new CallInfo();
+                CallInfo newCI = new CallInfo();
                 BaseCI[i] = newCI;
                 newCI.List = BaseCI;
                 newCI.Index = i;
             }
             CI = BaseCI[0];
             CI.FuncIndex = Top.Index;
-            StkId.inc(ref Top).V.SetNilValue(); // `function' entry for this `ci'
+            // `function' entry for this `ci'
+            StkId.inc(ref Top).V.SetNilValue();
             CI.TopIndex = Top.Index + LuaDef.LUA_MINSTACK;
         }
 
         private void InitRegistry()
         {
-            var mt = new TValue();
+            TValue mt = new TValue();
 
             G.Registry.V.SetHValue(new LuaTable(this));
 
